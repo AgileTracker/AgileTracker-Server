@@ -14,7 +14,7 @@ public class UserResponseDto
     [SwaggerSchema("Email do usuário.")]
     public string Email { get; set; } = string.Empty;
 
-    [SwaggerSchema("Tipo do usuário, representando seu papel no sistema.")]
+    [SwaggerSchema("Tipo do usuário, representando sua assinatura.")]
     public string Type { get; set; } = string.Empty;
 
     [SwaggerSchema("URL do avatar do usuário.")]
@@ -22,4 +22,7 @@ public class UserResponseDto
 
     [SwaggerSchema("Data de criação do registro.")]
     public DateTime CreatedAt { get; set; }
+    
+    [SwaggerSchema("Data de atualização do registro.")]
+    public DateTime UpdatedAt { get; set; }
 }

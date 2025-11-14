@@ -44,6 +44,29 @@ namespace agileTrackerServer.Data
 
                 entity.HasIndex(u => u.Email)
                       .IsUnique();
+                
+                entity.Property(u => u.Type)
+                      .HasConversion<string>()
+                      .HasMaxLength(20)
+                      .IsRequired();
+                
+                entity.Property(u => u.PasswordHash)
+                      .IsRequired();
+
+                entity.Property(u => u.AvatarUrl)
+                      .HasMaxLength(400);
+
+                entity.Property(u => u.CreatedAt)
+                      .IsRequired();
+                
+                entity.Property(u => u.UpdatedAt)
+                      .IsRequired();
+                
+                entity.HasCheckConstraint(
+                      "CK_User_Type",
+                      "\"Type\" IN ('Free', 'Plus')"
+                );
+
             });
 
             modelBuilder.Entity<Project>(entity =>

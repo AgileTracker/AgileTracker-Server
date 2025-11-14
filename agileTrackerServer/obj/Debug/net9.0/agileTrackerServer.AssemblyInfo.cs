@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("agileTrackerServer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ffbaea4c0374857fe382ab3b153eb9429bb12583")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+156d9018ce45ff6299329504ed107e12019db660")]
 [assembly: System.Reflection.AssemblyProductAttribute("agileTrackerServer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("agileTrackerServer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

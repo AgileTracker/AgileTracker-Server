@@ -14,6 +14,9 @@ public class CreateUserDto
     [SwaggerSchema("Senha em texto puro para cadastro. Será hasheada no servidor.")]
     public string Password { get; set; } = string.Empty;
 
-    [SwaggerSchema("Tipo do usuário (exemplo: 'Admin', 'Member').")]
+    [SwaggerSchema("Tipo do usuário (exemplo: 'Free', 'Plus').")]
     public string Type { get; set; } = string.Empty;
+    
+    [SwaggerSchema("Url da imagem de perfil do usuário")]
+    public string? AvatarUrl { get; set; } = string.Empty;
 }

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj": {}
+    "C:\\AgileTracker\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj": {}
   },
   "projects": {
-    "C:\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj": {
+    "C:\\AgileTracker\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
+        "projectUniqueName": "C:\\AgileTracker\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
         "projectName": "agileTrackerServer",
-        "projectPath": "C:\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
+        "projectPath": "C:\\AgileTracker\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
         "packagesPath": "C:\\Users\\Leona\\.nuget\\packages\\",
-        "outputPath": "C:\\AgileTracker-Server\\agileTrackerServer\\obj\\",
+        "outputPath": "C:\\AgileTracker\\AgileTracker-Server\\agileTrackerServer\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

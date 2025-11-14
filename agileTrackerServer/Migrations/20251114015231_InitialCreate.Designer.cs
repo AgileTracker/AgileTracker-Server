@@ -12,7 +12,7 @@ using agileTrackerServer.Data;
 namespace agileTrackerServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251112013327_InitialCreate")]
+    [Migration("20251114015231_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -71,6 +71,11 @@ namespace agileTrackerServer.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
+                    b.Property<string>("AvatarUrl")
+                        .IsRequired()
+                        .HasMaxLength(400)
+                        .HasColumnType("character varying(400)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -88,16 +93,23 @@ namespace agileTrackerServer.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Role")
+                    b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_User_Type", "\"Type\" IN ('Free', 'Plus')");
+                        });
                 });
 
             modelBuilder.Entity("agileTrackerServer.Models.Entities.Project", b =>

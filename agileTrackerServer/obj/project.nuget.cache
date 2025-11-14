@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "VYYSL7PWM44=",
+  "dgSpecHash": "ncRMQKrULV4=",
   "success": true,
-  "projectFilePath": "C:\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
+  "projectFilePath": "C:\\AgileTracker\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Leona\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\Leona\\.nuget\\packages\\microsoft.aspnetcore.openapi\\9.0.0-preview.5.24306.11\\microsoft.aspnetcore.openapi.9.0.0-preview.5.24306.11.nupkg.sha512",
@@ -68,9 +68,9 @@
       "code": "NU1603",
       "level": "Warning",
       "message": "agileTrackerServer depends on Microsoft.AspNetCore.OpenApi (>= 9.0.0-preview.5.24306.7) but Microsoft.AspNetCore.OpenApi 9.0.0-preview.5.24306.7 was not found. Microsoft.AspNetCore.OpenApi 9.0.0-preview.5.24306.11 was resolved instead.",
-      "projectPath": "C:\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
+      "projectPath": "C:\\AgileTracker\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
       "warningLevel": 1,
-      "filePath": "C:\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
+      "filePath": "C:\\AgileTracker\\AgileTracker-Server\\agileTrackerServer\\agileTrackerServer.csproj",
       "libraryId": "Microsoft.AspNetCore.OpenApi",
       "targetGraphs": [
         "net9.0"
