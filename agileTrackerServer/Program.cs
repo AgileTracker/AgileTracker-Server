@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using agileTrackerServer.Middlewares;
 using agileTrackerServer.Utils;
 
 
@@ -166,6 +167,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 
 // ============================================================================
 // 🗃️ MIGRAÇÃO AUTOMÁTICA DO BANCO

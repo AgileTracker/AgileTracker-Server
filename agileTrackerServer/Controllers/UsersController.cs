@@ -1,5 +1,6 @@
 using agileTrackerServer.Models.Dtos.Project;
 using agileTrackerServer.Models.Dtos.User;
+using agileTrackerServer.Models.ViewModels;
 using agileTrackerServer.Services;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -35,23 +36,13 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ResponseUserDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<ResponseUserDto>> Create([FromBody] CreateUserDto request)
     {
-        try
-        {
-            var user = await _service.CreateAsync(request);
+        var user = await _service.CreateAsync(request);
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = user.Id },
-                user
-            );
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new
-            {
-                message = ex.Message
-            });
-        }
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = user.Id },
+            ResultViewModel<ResponseUserDto>.Ok("Usuário criado com sucesso!", user)
+        );
     }
 
 }
