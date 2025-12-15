@@ -9,11 +9,13 @@ namespace agileTrackerServer.Services
     {
         private readonly IUserRepository _repository;
         private readonly PasswordHasher _hasher;
+        private readonly TokenService _tokenService;
 
-        public UserService(IUserRepository repository, PasswordHasher hasher)
+        public UserService(IUserRepository repository, PasswordHasher hasher, TokenService tokenService)
         {
             _repository = repository;
             _hasher = hasher;
+            _tokenService = tokenService;
         }
         
         public async Task<ResponseUserDto?> GetByIdAsync(Guid id)
@@ -22,11 +24,11 @@ namespace agileTrackerServer.Services
             return user is null ? null : MapToDto(user);
         }
 
-        public async Task<ResponseUserDto> CreateAsync(CreateUserDto dto)
+        public async Task<(ResponseUserDto user, string token)> CreateAsync(CreateUserDto dto)
         {
             if (await _repository.EmailExistsAsync(dto.Email))
                 throw new Exception("Já existe um usuário com este email.");
-            
+    
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -36,14 +38,19 @@ namespace agileTrackerServer.Services
                 PasswordHash = _hasher.HashPassword(dto.Password),
                 AvatarUrl = dto.AvatarUrl
             };
-        
+
             await _repository.AddAsync(user);
             await _repository.SaveChangesAsync();
 
+            // gerar token
+            string token = _tokenService.GenerateToken(user);
+
+            // buscar DTO completo
             var created = await _repository.GetByIdAsync(user.Id) ?? user;
-            
-            return MapToDto(created);
+
+            return (MapToDto(created), token);
         }
+
         
         private static ResponseUserDto MapToDto(User u)
         {

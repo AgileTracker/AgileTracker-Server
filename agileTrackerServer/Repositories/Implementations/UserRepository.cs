@@ -13,24 +13,23 @@ namespace agileTrackerServer.Repositories.Implementations
         {
             _context = context;
         }
-        
         public async Task<IEnumerable<User>> GetAllAsync() =>
             await _context.Users.AsNoTracking().ToListAsync();
         
-        public async Task<User?> GetByIdAsync(Guid id) =>
-            await _context.Users.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id);
-        
-        public async Task AddAsync(User user) =>
-            await _context.Users.AddAsync(user);
-        
-        public async Task SaveChangesAsync() =>
-            await _context.SaveChangesAsync();
-        
+        public async Task<User?> GetByIdAsync(Guid id)
+            => await _context.Users.FindAsync(id);
+
+        public async Task<User?> GetByEmailAsync(string email)
+            => await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
         public async Task<bool> EmailExistsAsync(string email)
-        {
-            return await _context.Users.AnyAsync(u => u.Email == email);
-        }
+            => await _context.Users.AnyAsync(u => u.Email == email);
+
+        public async Task AddAsync(User user)
+            => await _context.Users.AddAsync(user);
+
+        public async Task SaveChangesAsync()
+            => await _context.SaveChangesAsync();
         
     }
 }

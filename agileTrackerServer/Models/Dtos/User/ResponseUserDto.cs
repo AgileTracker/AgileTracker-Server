@@ -23,7 +23,27 @@ public class ResponseUserDto
 
     [SwaggerSchema("Data de criação do registro.")]
     public DateTime CreatedAt { get; set; }
-    
+
     [SwaggerSchema("Data de atualização do registro.")]
     public DateTime UpdatedAt { get; set; }
+
+    // ============================
+    // ✅ CONSTRUTOR DE MAPEAMENTO
+    // ============================
+    public ResponseUserDto(Entities.User user)
+    {
+        Id = user.Id;
+        Name = user.Name;
+        Email = user.Email;
+        Type = user.Type;
+        AvatarUrl = user.AvatarUrl;
+        CreatedAt = user.CreatedAt;
+        UpdatedAt = user.UpdatedAt;
+    }
+
+    // ============================
+    // 🔹 CONSTRUTOR VAZIO
+    // Necessário para serialização / Swagger
+    // ============================
+    public ResponseUserDto() { }
 }

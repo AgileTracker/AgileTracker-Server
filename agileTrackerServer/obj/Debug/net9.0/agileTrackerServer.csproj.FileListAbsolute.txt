@@ -293,6 +293,7 @@ C:\Leo\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Konscious.Securit
 C:\Leo\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Konscious.Security.Cryptography.Blake2.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\appsettings.Development.json
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\appsettings.json
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\global.json
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\agileTrackerServer.staticwebassets.endpoints.json
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\agileTrackerServer.exe
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\agileTrackerServer.deps.json
@@ -332,6 +333,10 @@ C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsof
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.Extensions.Options.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.Extensions.Primitives.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.IdentityModel.Abstractions.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.IdentityModel.Logging.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.IdentityModel.Tokens.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.OpenApi.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Mono.TextTemplating.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Npgsql.dll
@@ -347,6 +352,7 @@ C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\System.C
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\System.Composition.Runtime.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\System.Composition.TypedParts.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\System.Diagnostics.DiagnosticSource.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\System.IdentityModel.Tokens.Jwt.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\System.IO.Pipelines.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\System.Text.Encodings.Web.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\System.Text.Json.dll
@@ -418,7 +424,6 @@ C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\zh-Hant\
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\runtimes\win\lib\net9.0\System.Text.Encodings.Web.dll
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.csproj.AssemblyReference.cache
-C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\rpswa.dswa.cache.json
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.GeneratedMSBuildEditorConfig.editorconfig
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.AssemblyInfoInputs.cache
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.AssemblyInfo.cs
@@ -426,12 +431,8 @@ C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTra
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.MvcApplicationPartsAssemblyInfo.cs
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.MvcApplicationPartsAssemblyInfo.cache
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.sourcelink.json
-C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\rjimswa.dswa.cache.json
-C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
-C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\scopedcss\bundle\agileTrackerServer.styles.css
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\staticwebassets.build.json
-C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\staticwebassets.build.json.cache
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\staticwebassets.development.json
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\staticwebassets.build.endpoints.json
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTra.32E73600.Up2Date
@@ -440,3 +441,11 @@ C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\refint\a
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.pdb
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\agileTrackerServer.genruntimeconfig.cache
 C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\ref\agileTrackerServer.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\bin\Debug\net9.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\rpswa.dswa.cache.json
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\rjimswa.dswa.cache.json
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\rjsmrazor.dswa.cache.json
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\rjsmcshtml.dswa.cache.json
+C:\AgileTracker\AgileTracker-Server\agileTrackerServer\obj\Debug\net9.0\staticwebassets.build.json.cache

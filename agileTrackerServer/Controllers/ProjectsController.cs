@@ -1,11 +1,13 @@
 using agileTrackerServer.Models.Dtos.Project;
 using agileTrackerServer.Models.ViewModels;
 using agileTrackerServer.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace agileTrackerServer.Controllers
 {
+    [Authorize] 
     [ApiController]
     [Route("api/[controller]")]
     public class ProjectsController : ControllerBase

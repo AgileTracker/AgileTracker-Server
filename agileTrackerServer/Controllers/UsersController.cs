@@ -64,7 +64,18 @@ public class UsersController : ControllerBase
     [ProducesResponseType(typeof(ResultViewModel<ResponseUserDto>), StatusCodes.Status201Created)]
     public async Task<IActionResult> Create([FromBody] CreateUserDto request)
     {
-        var user = await _service.CreateAsync(request);
+        var (user, token) = await _service.CreateAsync(request);
+
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7),
+            Path = "/"
+        };
+
+        Response.Cookies.Append("token", token, cookieOptions);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -72,4 +83,5 @@ public class UsersController : ControllerBase
             ResultViewModel<ResponseUserDto>.Ok("Usuário criado com sucesso!", user)
         );
     }
+
 }

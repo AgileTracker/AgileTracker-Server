@@ -1,21 +1,34 @@
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using agileTrackerServer.Data;
-using agileTrackerServer.Services;
+using agileTrackerServer.Middlewares;
+using agileTrackerServer.Models.ViewModels;
 using agileTrackerServer.Repositories.Implementations;
 using agileTrackerServer.Repositories.Interfaces;
+using agileTrackerServer.Services;
+using agileTrackerServer.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using agileTrackerServer.Middlewares;
-using agileTrackerServer.Utils;
-
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-string pepper = builder.Configuration["Security:Pepper"];
+// ============================================================================
+// 🔐 SECURITY SETTINGS
+// ============================================================================
+
+builder.Services.Configure<SecuritySettings>(
+    builder.Configuration.GetSection("Security")
+);
+
+var jwtKey = Encoding.UTF8.GetBytes(
+    builder.Configuration["Security:JwtSecret"]!
+);
 
 // ============================================================================
-// ⚙️ CONFIGURAÇÃO BÁSICA DO ASP.NET CORE
+// ⚙️ ASP.NET CORE
 // ============================================================================
 
 builder.Services.AddControllers()
@@ -31,16 +44,77 @@ builder.Services.AddControllers()
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
-    // Evita resposta 400 automática em ModelState inválido (tratado manualmente)
-    options.SuppressModelStateInvalidFilter = true;
+    // MANTÉM a validação automática de ModelState
+    // ❌ NÃO usar SuppressModelStateInvalidFilter = true
+
+    // Evita respostas automáticas 404/405 sem body
     options.SuppressMapClientErrors = true;
+
+    // Customiza a resposta de validação para seu contrato
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .SelectMany(x => x.Value!.Errors)
+            .Select(e => e.ErrorMessage)
+            .ToList();
+
+        return new BadRequestObjectResult(
+            ResultViewModel.Fail("Erro de validação", errors)
+        );
+    };
 });
 
-builder.Services.Configure<SecuritySettings>(
-    builder.Configuration.GetSection("Security"));
 
 // ============================================================================
-// 🧩 SWAGGER / OPENAPI
+// 🔑 AUTHENTICATION (JWT via HttpOnly Cookie)
+// ============================================================================
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(jwtKey),
+            ClockSkew = TimeSpan.Zero
+        };
+
+        // 🔑 Lê o JWT do COOKIE HttpOnly
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Cookies.TryGetValue(
+                    "token",
+                    out var token))
+                {
+                    context.Token = token;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+// ============================================================================
+// 🔐 AUTHORIZATION (Roles por Type)
+// ============================================================================
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("PlusOnly", policy =>
+        policy.RequireClaim("Type", "Plus", "Admin"));
+
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireClaim("Type", "Admin"));
+});
+
+// ============================================================================
+// 🧩 SWAGGER
 // ============================================================================
 
 builder.Services.AddEndpointsApiExplorer();
@@ -50,74 +124,50 @@ builder.Services.AddSwaggerGen(c =>
     c.SwaggerDoc("v1", new()
     {
         Title = "AgileTracker Server API",
-        Version = "v1",
-        Description = "API para gestão de backlog, sprints, kanban e modelagem de dados (Next.js frontend)",
-        Contact = new()
-        {
-            Name = "Equipe AgileTracker",
-            Email = "dev@agiletracker.io"
-        }
+        Version = "v1"
     });
-
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-        c.IncludeXmlComments(xmlPath);
 });
 
 // ============================================================================
-// 🗄️ CONFIGURAÇÃO DO BANCO DE DADOS (PostgreSQL)
+// 🗄️ DATABASE (PostgreSQL)
 // ============================================================================
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-if (string.IsNullOrEmpty(connectionString))
-{
-    Console.WriteLine("⚠️ Nenhuma connection string encontrada. Usando PostgreSQL local padrão.");
-    connectionString = "Host=localhost;Port=5432;Database=agiletracker_dev;Username=postgres;Password=root";
-}
-
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Host=localhost;Port=5432;Database=agiletracker_dev;Username=postgres;Password=root";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-
 // ============================================================================
-// ⚙️ INJEÇÃO DE DEPENDÊNCIAS (SERVIÇOS, REPOSITÓRIOS E UTILS)
+// 🧩 DEPENDENCY INJECTION
 // ============================================================================
 
 // Repositories
-builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProjectRepository, ProjectRepository>();
 builder.Services.AddScoped<ISprintRepository, SprintRepository>();
 
 // Services
-builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<SprintService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<TokenService>();
 
 // Utils
 builder.Services.AddScoped<PasswordHasher>();
 
 // ============================================================================
-// 🌐 CORS (Substituindo Angular → Next.js)
+// 🌐 CORS
 // ============================================================================
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevelopmentCors", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-    });
-
-    options.AddPolicy("ProductionCors", policy =>
-    {
-        policy.WithOrigins("https://app.agiletracker.io", "https://agiletracker.io")
+        policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -125,85 +175,37 @@ builder.Services.AddCors(options =>
 });
 
 // ============================================================================
-// 🪵 LOGGING
+// 🚀 PIPELINE
 // ============================================================================
-
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-
-builder.Logging.SetMinimumLevel(
-    builder.Environment.IsProduction() ? LogLevel.Warning : LogLevel.Information
-);
-
-// ============================================================================
-// 🚀 PIPELINE DE EXECUÇÃO
-// ============================================================================
-
 
 var app = builder.Build();
 
+// ⚠️ Middleware global PRIMEIRO
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Desenvolvimento
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "AgileTracker API v1");
-        c.RoutePrefix = string.Empty;
-        c.DisplayRequestDuration();
-    });
-
+    app.UseSwaggerUI();
     app.UseCors("DevelopmentCors");
-}
-else
-{
-    app.UseHsts();
-    app.UseCors("ProductionCors");
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
-
 // ============================================================================
-// 🗃️ MIGRAÇÃO AUTOMÁTICA DO BANCO
+// 🗃️ MIGRATIONS
 // ============================================================================
 
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
-    try
-    {
-        await context.Database.MigrateAsync();
-        app.Logger.LogInformation("✅ Banco de dados migrado com sucesso");
-    }
-    catch (Exception ex)
-    {
-        app.Logger.LogError(ex, "❌ Erro ao aplicar migrações no banco de dados");
-
-        if (app.Environment.IsProduction())
-            throw;
-    }
-}
-
-// ============================================================================
-// ✅ INICIALIZAÇÃO
-// ============================================================================
-
-app.Logger.LogInformation("=== AgileTracker Server iniciado ===");
-app.Logger.LogInformation("Ambiente: {Env}", app.Environment.EnvironmentName);
-app.Logger.LogInformation("Banco: {Conn}", connectionString);
-
-if (app.Environment.IsDevelopment())
-{
-    app.Logger.LogInformation("Swagger disponível em: /");
-    app.Logger.LogInformation("Frontend Next.js: http://localhost:3000");
+    await context.Database.MigrateAsync();
 }
 
 app.Run();
