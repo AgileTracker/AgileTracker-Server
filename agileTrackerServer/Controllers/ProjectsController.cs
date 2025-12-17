@@ -2,6 +2,7 @@ using System.Security.Claims;
 using agileTrackerServer.Models.Dtos.Project;
 using agileTrackerServer.Models.ViewModels;
 using agileTrackerServer.Services;
+using agileTrackerServer.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -19,8 +20,7 @@ namespace agileTrackerServer.Controllers
         {
             _service = service;
         }
-
-        // GET api/projects
+        
         [Authorize(Policy = "AdminOnly")]
         [HttpGet]
         [SwaggerOperation(Summary = "Lista todos os projetos.")]
@@ -36,8 +36,7 @@ namespace agileTrackerServer.Controllers
                 )
             );
         }
-
-        // GET api/projects/{id}
+        
         [Authorize]
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Busca um projeto pelo ID.")]
@@ -86,8 +85,7 @@ namespace agileTrackerServer.Controllers
                 )
             );
         }
-
-        // POST api/projects
+        
         [Authorize]
         [HttpPost]
         [SwaggerOperation(Summary = "Cria um novo projeto.")]
@@ -111,6 +109,22 @@ namespace agileTrackerServer.Controllers
                 ResultViewModel<ProjectResponseDto>.Ok(
                     "Projeto criado com sucesso!",
                     project
+                )
+            );
+        }
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(
+            Guid id,
+            UpdateProjectDto dto)
+        {
+                var userId = User.GetUserId();
+
+            var updated = await _service.UpdateAsync(id, dto, userId);
+
+            return Ok(
+                ResultViewModel<ProjectResponseDto>.Ok(
+                    "Projeto atualizado com sucesso.",
+                    updated
                 )
             );
         }

@@ -1,6 +1,7 @@
 using agileTrackerServer.Models.Entities;
 using agileTrackerServer.Repositories.Interfaces;
 using agileTrackerServer.Models.Dtos.Project;
+using agileTrackerServer.Models.Exceptions;
 
 
 namespace agileTrackerServer.Services
@@ -26,28 +27,32 @@ namespace agileTrackerServer.Services
             return project is null ? null : MapToDto(project);
         }
 
-        public async Task<ProjectResponseDto> CreateAsync(CreateProjectDto dto, Guid OwnerId)
+        public async Task<ProjectResponseDto> CreateAsync(CreateProjectDto dto, Guid ownerId)
         {
-            
-            var project = new Project
-            {
-                Id = Guid.NewGuid(),
-                Name = dto.Name,
-                Description = dto.Description,
-                OwnerId = OwnerId,
-                Status = "Active",          
-                CreatedAt = DateTime.UtcNow,
-            };
+            var project = new Project(dto.Name, dto.Description, ownerId);
 
             await _repository.AddAsync(project);
             await _repository.SaveChangesAsync();
 
-            // recarrega com Owner incluído se precisar do OwnerName
-            var created = await _repository.GetByIdAsync(project.Id, OwnerId) ?? project;
+            var created = await _repository.GetByIdAsync(project.Id, ownerId) ?? project;
 
             return MapToDto(created);
         }
+        
+        public async Task<ProjectResponseDto> UpdateAsync(
+            Guid projectId,
+            UpdateProjectDto dto,
+            Guid ownerId)
+        {
+            var project = await _repository.GetByIdAsync(projectId, ownerId)
+                          ?? throw new DomainException("Projeto não encontrado.");
 
+            project.UpdateDetails(dto.Name, dto.Description);
+
+            await _repository.SaveChangesAsync();
+
+            return MapToDto(project);
+        }
         private static ProjectResponseDto MapToDto(Project p)
         {
             return new ProjectResponseDto
