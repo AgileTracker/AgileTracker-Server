@@ -1,3 +1,4 @@
+using agileTrackerServer.Models.Enums;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace agileTrackerServer.Models.Dtos.Project;
@@ -21,7 +22,7 @@ public class ProjectResponseDto
     public string OwnerName { get; set; } = string.Empty;
 
     [SwaggerSchema("Status atual do projeto (ex.: Active, Archived).")]
-    public string Status { get; set; } = string.Empty;
+    public ProjectStatus Status { get; set; }
 
     [SwaggerSchema("Data de criação do projeto.")]
     public DateTime CreatedAt { get; set; }

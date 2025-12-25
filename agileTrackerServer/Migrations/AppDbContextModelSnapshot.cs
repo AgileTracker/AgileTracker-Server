@@ -49,16 +49,17 @@ namespace agileTrackerServer.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("Active");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("projects", (string)null);
+                    b.ToTable("projects", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Project_Status", "\"Status\" IN ('Active', 'Archived')");
+                        });
                 });
 
             modelBuilder.Entity("agileTrackerServer.Models.Entities.User", b =>

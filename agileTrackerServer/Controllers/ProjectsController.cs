@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using agileTrackerServer.Models.Dtos.Project;
 using agileTrackerServer.Models.ViewModels;
 using agileTrackerServer.Services;
@@ -7,126 +6,118 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 
-namespace agileTrackerServer.Controllers
+namespace agileTrackerServer.Controllers;
+
+[Authorize]
+[ApiController]
+[Route("api/[controller]")]
+public class ProjectsController : ControllerBase
 {
-    [Authorize] 
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ProjectsController : ControllerBase
+    private readonly ProjectService _service;
+
+    public ProjectsController(ProjectService service)
     {
-        private readonly ProjectService _service;
+        _service = service;
+    }
 
-        public ProjectsController(ProjectService service)
-        {
-            _service = service;
-        }
-        
-        [Authorize(Policy = "AdminOnly")]
-        [HttpGet]
-        [SwaggerOperation(Summary = "Lista todos os projetos.")]
-        [ProducesResponseType(typeof(ResultViewModel<IEnumerable<ProjectResponseDto>>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
-        {
-            var projects = await _service.GetAllAsync();
+    // GET api/projects
+    [HttpGet]
+    [SwaggerOperation(Summary = "Lista todos os projetos ativos do usuário logado.")]
+    [ProducesResponseType(typeof(ResultViewModel<IEnumerable<ProjectResponseDto>>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAll()
+    {
+        var userId = User.GetUserId();
 
-            return Ok(
-                ResultViewModel<IEnumerable<ProjectResponseDto>>.Ok(
-                    "Lista de projetos obtida com sucesso!",
-                    projects
+        var projects = await _service.GetAllAsync(userId);
+
+        return Ok(
+            ResultViewModel<IEnumerable<ProjectResponseDto>>.Ok(
+                "Projetos carregados com sucesso.",
+                projects
+            )
+        );
+    }
+
+    // GET api/projects/{id}
+    [HttpGet("{id}")]
+    [SwaggerOperation(Summary = "Busca um projeto pelo ID.")]
+    [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResultViewModel), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResultViewModel), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById(string id)
+    {
+        if (!Guid.TryParse(id, out var projectId))
+        {
+            return BadRequest(
+                ResultViewModel.Fail(
+                    "ID inválido.",
+                    new List<string> { "O ID informado não é um GUID válido." }
                 )
             );
         }
-        
-        [Authorize]
-        [HttpGet("{id}")]
-        [SwaggerOperation(Summary = "Busca um projeto pelo ID.")]
-        [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ResultViewModel), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(string id)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (!Guid.TryParse(userIdClaim, out var userId))
-            {
-                return Unauthorized(
-                    ResultViewModel.Fail("Usuário não autenticado.")
-                );
-            }
-            
-            // 1. Validar GUID manualmente
-            if (!Guid.TryParse(id, out var guid))
-            {
-                return BadRequest(
-                    ResultViewModel.Fail(
-                        "O ID informado é inválido.",
-                        new List<string> { "O parâmetro não é um GUID válido." }
-                    )
-                );
-            }
+        var userId = User.GetUserId();
 
-            // 2. Buscar o projeto
-            var project = await _service.GetByIdAsync(guid, userId);
+        var project = await _service.GetByIdAsync(projectId, userId);
 
-            if (project == null)
-            {
-                return NotFound(
-                    ResultViewModel.Fail(
-                        "Projeto não encontrado!",
-                        new List<string> { "Nenhum projeto com esse ID foi localizado." }
-                    )
-                );
-            }
+        return Ok(
+            ResultViewModel<ProjectResponseDto>.Ok(
+                "Projeto encontrado com sucesso.",
+                project
+            )
+        );
+    }
 
-            // 3. Retorno padrão
-            return Ok(
-                ResultViewModel<ProjectResponseDto>.Ok(
-                    "Projeto encontrado com sucesso!",
-                    project
-                )
-            );
-        }
-        
-        [Authorize]
-        [HttpPost]
-        [SwaggerOperation(Summary = "Cria um novo projeto.")]
-        [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create([FromBody] CreateProjectDto request)
-        {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    // POST api/projects
+    [HttpPost]
+    [SwaggerOperation(Summary = "Cria um novo projeto.")]
+    [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status201Created)]
+    public async Task<IActionResult> Create([FromBody] CreateProjectDto request)
+    {
+        var userId = User.GetUserId();
 
-            if (!Guid.TryParse(userIdClaim, out var userId))
-            {
-                return Unauthorized(
-                    ResultViewModel.Fail("Usuário não autenticado.")
-                );
-            }
+        var project = await _service.CreateAsync(request, userId);
 
-            var project = await _service.CreateAsync(request, userId);
+        return CreatedAtAction(
+            nameof(GetById),
+            new { id = project.Id },
+            ResultViewModel<ProjectResponseDto>.Ok(
+                "Projeto criado com sucesso.",
+                project
+            )
+        );
+    }
 
-            return CreatedAtAction(
-                nameof(GetById),
-                new { id = project.Id },
-                ResultViewModel<ProjectResponseDto>.Ok(
-                    "Projeto criado com sucesso!",
-                    project
-                )
-            );
-        }
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> Update(
-            Guid id,
-            UpdateProjectDto dto)
-        {
-                var userId = User.GetUserId();
+    // PUT api/projects/{id}
+    [HttpPut("{id:guid}")]
+    [SwaggerOperation(Summary = "Atualiza os dados de um projeto.")]
+    [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateProjectDto dto)
+    {
+        var userId = User.GetUserId();
 
-            var updated = await _service.UpdateAsync(id, dto, userId);
+        var updated = await _service.UpdateAsync(id, dto, userId);
 
-            return Ok(
-                ResultViewModel<ProjectResponseDto>.Ok(
-                    "Projeto atualizado com sucesso.",
-                    updated
-                )
-            );
-        }
+        return Ok(
+            ResultViewModel<ProjectResponseDto>.Ok(
+                "Projeto atualizado com sucesso.",
+                updated
+            )
+        );
+    }
+
+    // POST api/projects/{id}/archive
+    [HttpPost("{id:guid}/archive")]
+    [SwaggerOperation(Summary = "Arquiva um projeto.")]
+    [ProducesResponseType(typeof(ResultViewModel), StatusCodes.Status200OK)]
+    public async Task<IActionResult> Archive(Guid id)
+    {
+        var userId = User.GetUserId();
+
+        await _service.ArchiveAsync(id, userId);
+
+        return Ok(
+            ResultViewModel.Ok("Projeto arquivado com sucesso.")
+        );
     }
 }

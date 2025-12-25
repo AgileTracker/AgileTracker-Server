@@ -1,4 +1,5 @@
 using agileTrackerServer.Models.Entities;
+using agileTrackerServer.Models.Enums;
 using agileTrackerServer.Models.Exceptions;
 
 namespace agileTrackerServer.Models.Entities;
@@ -8,7 +9,7 @@ public class Project
     public Guid Id { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
-    public string Status { get; private set; } = "Active";
+    public ProjectStatus Status { get; private set; } = ProjectStatus.Active;
     public Guid OwnerId { get; private set; }
 
     public User? Owner { get; private set; }
@@ -27,7 +28,7 @@ public class Project
         Id = Guid.NewGuid();
         Name = name.Trim();
         Description = description?.Trim() ?? string.Empty;
-        Status = "Active";
+        Status = ProjectStatus.Active;
         OwnerId = ownerId;
         CreatedAt = DateTime.UtcNow;
     }
@@ -43,6 +44,6 @@ public class Project
 
     public void Archive()
     {
-        Status = "Archived";
+        Status = ProjectStatus.Archived;
     }
 }

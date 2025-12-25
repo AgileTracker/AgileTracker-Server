@@ -12,7 +12,7 @@ using agileTrackerServer.Data;
 namespace agileTrackerServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251216022412_InitialCreate")]
+    [Migration("20251225203940_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -52,16 +52,17 @@ namespace agileTrackerServer.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValue("Active");
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("projects", (string)null);
+                    b.ToTable("projects", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Project_Status", "\"Status\" IN ('Active', 'Archived')");
+                        });
                 });
 
             modelBuilder.Entity("agileTrackerServer.Models.Entities.User", b =>

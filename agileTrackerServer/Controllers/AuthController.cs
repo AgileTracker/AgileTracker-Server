@@ -2,11 +2,10 @@ using agileTrackerServer.Models.Dtos.Auth;
 using agileTrackerServer.Models.Dtos.User;
 using agileTrackerServer.Models.ViewModels;
 using agileTrackerServer.Services;
+using agileTrackerServer.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Security.Claims;
-using agileTrackerServer.Models.Enums;
 
 namespace agileTrackerServer.Controllers;
 
@@ -27,6 +26,7 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     [SwaggerOperation(Summary = "Login do usuário.")]
     [ProducesResponseType(typeof(ResultViewModel<ResponseUserDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResultViewModel), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         var (user, token) = await _authService.LoginAsync(dto.Email, dto.Password);
@@ -55,13 +55,16 @@ public class AuthController : ControllerBase
     // ============================
     // LOGOUT
     // ============================
+    [Authorize]
     [HttpPost("logout")]
     [SwaggerOperation(Summary = "Logout do usuário.")]
     public IActionResult Logout()
     {
         Response.Cookies.Delete("token");
 
-        return Ok(ResultViewModel.Ok("Logout realizado com sucesso."));
+        return Ok(
+            ResultViewModel.Ok("Logout realizado com sucesso.")
+        );
     }
 
     // ============================
@@ -69,34 +72,11 @@ public class AuthController : ControllerBase
     // ============================
     [Authorize]
     [HttpGet("me")]
+    [SwaggerOperation(Summary = "Retorna os dados do usuário autenticado.")]
+    [ProducesResponseType(typeof(ResultViewModel<ResponseUserDto>), StatusCodes.Status200OK)]
     public IActionResult Me()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (string.IsNullOrEmpty(userId))
-        {
-            return Unauthorized(
-                ResultViewModel.Fail("Usuário não autenticado.")
-            );
-        }
-
-        var typeClaim = User.FindFirstValue("Type");
-
-        var userType = Enum.TryParse<UserType>(
-            typeClaim,
-            ignoreCase: true,
-            out var parsedType
-        )
-            ? parsedType
-            : UserType.Free;
-
-        var user = new ResponseUserDto
-        {
-            Id = Guid.Parse(userId),
-            Name = User.FindFirstValue("Name") ?? string.Empty,
-            Email = User.FindFirstValue("Email") ?? string.Empty,
-            Type = userType
-        };
+        var user = _authService.GetAuthenticatedUser(User);
 
         return Ok(
             ResultViewModel<ResponseUserDto>.Ok(

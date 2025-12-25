@@ -40,13 +40,14 @@ namespace agileTrackerServer.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValue: "Active"),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_projects", x => x.Id);
+                    table.CheckConstraint("CK_Project_Status", "\"Status\" IN ('Active', 'Archived')");
                     table.ForeignKey(
                         name: "FK_projects_users_OwnerId",
                         column: x => x.OwnerId,

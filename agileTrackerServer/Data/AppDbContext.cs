@@ -81,7 +81,8 @@ namespace agileTrackerServer.Data
 
                 entity.Property(p => p.Status)
                       .HasMaxLength(50)
-                      .HasDefaultValue("Active");
+                      .HasConversion<string>()
+                      .IsRequired();
 
                 entity.Property(p => p.CreatedAt)
                       .HasDefaultValueSql("NOW()");
@@ -91,6 +92,11 @@ namespace agileTrackerServer.Data
                       .WithMany()
                       .HasForeignKey(p => p.OwnerId)
                       .OnDelete(DeleteBehavior.Cascade);
+                
+                entity.HasCheckConstraint(
+                      "CK_Project_Status",
+                      "\"Status\" IN ('Active', 'Archived')"
+                );
             });
         }
     }
