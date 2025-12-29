@@ -1,4 +1,3 @@
-using agileTrackerServer.Models.Entities;
 using agileTrackerServer.Models.Enums;
 using agileTrackerServer.Models.Exceptions;
 
