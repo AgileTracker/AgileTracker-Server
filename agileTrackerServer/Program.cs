@@ -8,6 +8,7 @@ using agileTrackerServer.Repositories.Implementations;
 using agileTrackerServer.Repositories.Interfaces;
 using agileTrackerServer.Services;
 using agileTrackerServer.Utils;
+using agileTrackerServer.Utils.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -155,6 +156,13 @@ builder.Services.AddScoped<ProjectService>();
 builder.Services.AddScoped<SprintService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<ProjectAuthorizationService>();
+builder.Services.AddScoped<ProjectRoleAuthorizationFilter>();
+
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ProjectRoleAuthorizationFilter>();
+});
 
 // Utils
 builder.Services.AddScoped<PasswordHasher>();

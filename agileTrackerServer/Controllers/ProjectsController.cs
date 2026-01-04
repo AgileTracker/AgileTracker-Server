@@ -1,6 +1,8 @@
 using agileTrackerServer.Models.Dtos.Project;
+using agileTrackerServer.Models.Enums;
 using agileTrackerServer.Models.ViewModels;
 using agileTrackerServer.Services;
+using agileTrackerServer.Utils.Authorization;
 using agileTrackerServer.Utils.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -107,17 +109,47 @@ public class ProjectsController : ControllerBase
     }
 
     // POST api/projects/{id}/archive
+    [Authorize]
+    [AuthorizeProjectRole(MemberRole.Owner)]
     [HttpPost("{id:guid}/archive")]
-    [SwaggerOperation(Summary = "Arquiva um projeto.")]
-    [ProducesResponseType(typeof(ResultViewModel), StatusCodes.Status200OK)]
     public async Task<IActionResult> Archive(Guid id)
     {
         var userId = User.GetUserId();
 
         await _service.ArchiveAsync(id, userId);
 
-        return Ok(
-            ResultViewModel.Ok("Projeto arquivado com sucesso.")
+        return Ok(ResultViewModel.Ok("Projeto arquivado com sucesso."));
+    }
+
+    
+    [Authorize]
+    [AuthorizeProjectRole(MemberRole.Owner, MemberRole.ScrumMaster)]
+    [HttpPost("{id:guid}/members")]
+    public async Task<IActionResult> AddMember(
+        Guid id,
+        AddProjectMemberDto dto)
+    {
+        var userId = User.GetUserId();
+
+        await _service.AddMemberAsync(
+            id,
+            userId,
+            dto.UserId,
+            dto.Role
         );
+
+        return Ok(ResultViewModel.Ok("Membro adicionado com sucesso."));
+    }
+
+    [Authorize]
+    [AuthorizeProjectRole(MemberRole.Owner, MemberRole.ScrumMaster)]
+    [HttpDelete("{id:guid}/members/{userId:guid}")]
+    public async Task<IActionResult> RemoveMember(Guid id, Guid userId)
+    {
+        var executorId = User.GetUserId();
+
+        await _service.RemoveMemberAsync(id, executorId, userId);
+
+        return Ok(ResultViewModel.Ok("Membro removido com sucesso."));
     }
 }

@@ -72,77 +72,64 @@ namespace agileTrackerServer.Data
 
             modelBuilder.Entity<Project>(entity =>
             {
-                entity.ToTable("projects");
-                entity.HasKey(p => p.Id);
-                entity.Property(p => p.Id)
-                      .HasDefaultValueSql("uuid_generate_v4()");
+                  entity.ToTable("projects");
 
-                entity.Property(p => p.Name)
-                      .HasMaxLength(255)
-                      .IsRequired();
+                  entity.HasKey(p => p.Id);
 
-                entity.Property(p => p.Status)
-                      .HasMaxLength(50)
-                      .HasConversion<string>()
-                      .IsRequired();
+                  entity.Property(p => p.Name)
+                        .HasMaxLength(255)
+                        .IsRequired();
 
-                entity.Property(p => p.CreatedAt)
-                      .HasDefaultValueSql("NOW()");
+                  entity.Property(p => p.Status)
+                        .HasConversion<string>()
+                        .IsRequired();
 
-                // 🔗 Relacionamento Project → Owner (User)
-                entity.HasOne(p => p.Owner)
-                      .WithMany()
-                      .HasForeignKey(p => p.OwnerId)
-                      .OnDelete(DeleteBehavior.Cascade);
-                
-                entity.HasCheckConstraint(
-                      "CK_Project_Status",
-                      "\"Status\" IN ('Active', 'Archived')"
-                );
+                  // 🔗 ÚNICO relacionamento Project → Members
+                  entity.HasMany(p => p.Members)
+                        .WithOne(pm => pm.Project)
+                        .HasForeignKey(pm => pm.ProjectId)
+                        .OnDelete(DeleteBehavior.Cascade);
             });
+            
             modelBuilder.Entity<ProjectMember>(entity =>
             {
-                entity.ToTable("project_members");
-            
-                entity.HasKey(pm => pm.Id);
-            
-                entity.Property(pm => pm.Id)
-                      .ValueGeneratedOnAdd();
-            
-                entity.Property(pm => pm.ProjectId)
-                      .IsRequired();
-            
-                entity.Property(pm => pm.UserId)
-                      .IsRequired();
-            
-                entity.Property(pm => pm.Role)
-                      .HasConversion<string>()
-                      .HasMaxLength(30)
-                      .IsRequired();
-            
-                entity.Property(pm => pm.JoinedAt)
-                      .HasDefaultValueSql("NOW()")
-                      .IsRequired();
-            
-                // 🔗 Relacionamentos (forma segura)
-                entity.HasOne<Project>()
-                      .WithMany()
-                      .HasForeignKey(pm => pm.ProjectId)
-                      .OnDelete(DeleteBehavior.Cascade);
-            
-                entity.HasOne<User>()
-                      .WithMany()
-                      .HasForeignKey(pm => pm.UserId)
-                      .OnDelete(DeleteBehavior.Cascade);
-            
-                entity.HasIndex(pm => new { pm.ProjectId, pm.UserId })
-                      .IsUnique();
+                  entity.ToTable("project_members");
+
+                  entity.HasKey(pm => pm.Id);
+
+                  entity.Property(pm => pm.Id)
+                        .ValueGeneratedOnAdd();
+
+                  entity.Property(pm => pm.ProjectId)
+                        .IsRequired();
+
+                  entity.Property(pm => pm.UserId)
+                        .IsRequired();
+
+                  entity.Property(pm => pm.Role)
+                        .HasConversion<string>()
+                        .HasMaxLength(30)
+                        .IsRequired();
+
+                  entity.Property(pm => pm.JoinedAt)
+                        .HasDefaultValueSql("NOW()")
+                        .IsRequired();
+
+                  // 🔗 Relacionamento SOMENTE com User
+                  entity.HasOne<User>()
+                        .WithMany()
+                        .HasForeignKey(pm => pm.UserId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                  // 🔐 Garantia: um usuário só entra uma vez no projeto
+                  entity.HasIndex(pm => new { pm.ProjectId, pm.UserId })
+                        .IsUnique();
+
                   entity.HasCheckConstraint(
                         "CK_ProjectMember_Role",
                         "\"Role\" IN ('Owner', 'ScrumMaster', 'ProductOwner', 'Developer')"
                   );
             });
-
         }
     }
 }

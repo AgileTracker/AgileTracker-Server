@@ -12,7 +12,7 @@ using agileTrackerServer.Data;
 namespace agileTrackerServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251225203940_InitialCreate")]
+    [Migration("20260104022442_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -30,13 +30,10 @@ namespace agileTrackerServer.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -52,16 +49,47 @@ namespace agileTrackerServer.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId");
+                    b.ToTable("projects", (string)null);
+                });
 
-                    b.ToTable("projects", null, t =>
+            modelBuilder.Entity("agileTrackerServer.Models.Entities.ProjectMember", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("JoinedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp without time zone")
+                        .HasDefaultValueSql("NOW()");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ProjectId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("project_members", null, t =>
                         {
-                            t.HasCheckConstraint("CK_Project_Status", "\"Status\" IN ('Active', 'Archived')");
+                            t.HasCheckConstraint("CK_ProjectMember_Role", "\"Role\" IN ('Owner', 'ScrumMaster', 'ProductOwner', 'Developer')");
                         });
                 });
 
@@ -113,15 +141,26 @@ namespace agileTrackerServer.Migrations
                         });
                 });
 
-            modelBuilder.Entity("agileTrackerServer.Models.Entities.Project", b =>
+            modelBuilder.Entity("agileTrackerServer.Models.Entities.ProjectMember", b =>
                 {
-                    b.HasOne("agileTrackerServer.Models.Entities.User", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
+                    b.HasOne("agileTrackerServer.Models.Entities.Project", "Project")
+                        .WithMany("Members")
+                        .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Owner");
+                    b.HasOne("agileTrackerServer.Models.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("agileTrackerServer.Models.Entities.Project", b =>
+                {
+                    b.Navigation("Members");
                 });
 #pragma warning restore 612, 618
         }

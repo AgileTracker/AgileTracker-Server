@@ -3,36 +3,48 @@ using agileTrackerServer.Models.Entities;
 using agileTrackerServer.Models.Enums;
 using agileTrackerServer.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
-namespace agileTrackerServer.Repositories.Implementations
+namespace agileTrackerServer.Repositories.Implementations;
+
+public class ProjectRepository : IProjectRepository
 {
-    public class ProjectRepository : IProjectRepository
+    private readonly AppDbContext _context;
+
+    public ProjectRepository(AppDbContext context)
     {
-        private readonly AppDbContext _context;
-        public ProjectRepository(AppDbContext context) => _context = context;
+        _context = context;
+    }
 
-        public async Task<IEnumerable<Project>> GetAllAsync(Guid ownerId) =>
-            await _context.Projects.Include(p => p.Owner)
-                .Where(p  => 
-                    p.OwnerId == ownerId && 
-                    p.Status == ProjectStatus.Active)
-                .ToListAsync();
+    public async Task<IEnumerable<Project>> GetAllAsync(Guid userId)
+    {
+        return await _context.Projects
+            .Include(p => p.Members)
+            .Where(p =>
+                p.Status == ProjectStatus.Active &&
+                p.Members.Any(m => m.UserId == userId)
+            )
+            .ToListAsync();
+    }
 
-        public async Task<Project?> GetByIdAsync(Guid id, Guid ownerId) =>
-            await _context.Projects
-                .Include(p => p.Owner)
-                .FirstOrDefaultAsync(p =>
-                    p.Id == id &&
-                    p.OwnerId == ownerId &&
-                    p.Status == ProjectStatus.Active
-                );
-        
-        public async Task AddAsync(Project project)
-        {
-            await _context.Projects.AddAsync(project);
-        }
+    public async Task<Project?> GetByIdAsync(Guid projectId, Guid userId)
+    {
+        return await _context.Projects
+            .Include(p => p.Members)
+            .FirstOrDefaultAsync(p =>
+                p.Id == projectId &&
+                p.Status == ProjectStatus.Active &&
+                p.Members.Any(m => m.UserId == userId)
+            );
+    }
 
-        public async Task SaveChangesAsync() =>
-            await _context.SaveChangesAsync();
+    public async Task AddAsync(Project project)
+    {
+        await _context.Projects.AddAsync(project);
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
     }
 }

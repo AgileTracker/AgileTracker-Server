@@ -27,13 +27,10 @@ namespace agileTrackerServer.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp without time zone")
-                        .HasDefaultValueSql("NOW()");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -49,17 +46,11 @@ namespace agileTrackerServer.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId");
-
-                    b.ToTable("projects", null, t =>
-                        {
-                            t.HasCheckConstraint("CK_Project_Status", "\"Status\" IN ('Active', 'Archived')");
-                        });
+                    b.ToTable("projects", (string)null);
                 });
 
             modelBuilder.Entity("agileTrackerServer.Models.Entities.ProjectMember", b =>
@@ -147,21 +138,10 @@ namespace agileTrackerServer.Migrations
                         });
                 });
 
-            modelBuilder.Entity("agileTrackerServer.Models.Entities.Project", b =>
-                {
-                    b.HasOne("agileTrackerServer.Models.Entities.User", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Owner");
-                });
-
             modelBuilder.Entity("agileTrackerServer.Models.Entities.ProjectMember", b =>
                 {
-                    b.HasOne("agileTrackerServer.Models.Entities.Project", null)
-                        .WithMany()
+                    b.HasOne("agileTrackerServer.Models.Entities.Project", "Project")
+                        .WithMany("Members")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -171,6 +151,13 @@ namespace agileTrackerServer.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("agileTrackerServer.Models.Entities.Project", b =>
+                {
+                    b.Navigation("Members");
                 });
 #pragma warning restore 612, 618
         }
