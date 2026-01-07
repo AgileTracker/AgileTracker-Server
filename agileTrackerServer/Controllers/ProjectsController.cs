@@ -24,6 +24,7 @@ public class ProjectsController : ControllerBase
 
     // GET api/projects
     [HttpGet]
+    [Authorize]
     [SwaggerOperation(Summary = "Lista todos os projetos ativos do usuário logado.")]
     [ProducesResponseType(typeof(ResultViewModel<IEnumerable<ProjectResponseDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll()
@@ -41,6 +42,8 @@ public class ProjectsController : ControllerBase
     }
 
     // GET api/projects/{id}
+    [Authorize]
+    [Authorize(Policy = "CanViewProject")]
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Busca um projeto pelo ID.")]
     [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status200OK)]
@@ -71,6 +74,7 @@ public class ProjectsController : ControllerBase
     }
 
     // POST api/projects
+    [Authorize]
     [HttpPost]
     [SwaggerOperation(Summary = "Cria um novo projeto.")]
     [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status201Created)]
@@ -91,6 +95,8 @@ public class ProjectsController : ControllerBase
     }
 
     // PUT api/projects/{id}
+    [Authorize]
+    [AuthorizeProjectRole(MemberRole.Owner)]
     [HttpPut("{id:guid}")]
     [SwaggerOperation(Summary = "Atualiza os dados de um projeto.")]
     [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status200OK)]
@@ -110,7 +116,7 @@ public class ProjectsController : ControllerBase
 
     // POST api/projects/{id}/archive
     [Authorize]
-    [AuthorizeProjectRole(MemberRole.Owner)]
+    [Authorize(Policy = "CanArchiveProject")]
     [HttpPost("{id:guid}/archive")]
     public async Task<IActionResult> Archive(Guid id)
     {
@@ -123,7 +129,7 @@ public class ProjectsController : ControllerBase
 
     
     [Authorize]
-    [AuthorizeProjectRole(MemberRole.Owner, MemberRole.ScrumMaster)]
+    [Authorize(Policy = "CanManageMembers")]
     [HttpPost("{id:guid}/members")]
     public async Task<IActionResult> AddMember(
         Guid id,
@@ -142,7 +148,7 @@ public class ProjectsController : ControllerBase
     }
 
     [Authorize]
-    [AuthorizeProjectRole(MemberRole.Owner, MemberRole.ScrumMaster)]
+    [Authorize(Policy = "CanManageMembers")]
     [HttpDelete("{id:guid}/members/{userId:guid}")]
     public async Task<IActionResult> RemoveMember(Guid id, Guid userId)
     {
@@ -153,6 +159,8 @@ public class ProjectsController : ControllerBase
         return Ok(ResultViewModel.Ok("Membro removido com sucesso."));
     }
     
+    [Authorize]
+    [Authorize(Policy = "CanViewProject")]
     [HttpGet("{id:guid}/members")]
     public async Task<IActionResult> GetMembers(Guid id)
     {
@@ -169,7 +177,7 @@ public class ProjectsController : ControllerBase
     }
     
     [Authorize]
-    [AuthorizeProjectRole(MemberRole.Owner, MemberRole.ScrumMaster)]
+    [Authorize(Policy = "CanManageMembers")]
     [HttpPost("{id:guid}/invites")]
     public async Task<IActionResult> InviteMember(
         Guid id,

@@ -10,7 +10,10 @@ using agileTrackerServer.Repositories.Interfaces;
 using agileTrackerServer.Services;
 using agileTrackerServer.Utils;
 using agileTrackerServer.Utils.Authorization;
+using agileTrackerServer.Utils.Authorization.Handlers;
+using agileTrackerServer.Utils.Authorization.Requirements;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -170,7 +173,31 @@ builder.Services.AddControllers(options =>
 
 // Utils
 builder.Services.AddScoped<PasswordHasher>();
+builder.Services.AddHttpContextAccessor();
 
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanViewProject",
+        policy => policy.Requirements.Add(new CanViewProjectRequirement()));
+
+    options.AddPolicy("CanArchiveProject",
+        policy => policy.Requirements.Add(new CanArchiveProjectRequirement()));
+
+    options.AddPolicy("CanInviteMembers",
+        policy => policy.Requirements.Add(new CanInviteMembersRequirement()));
+    
+    options.AddPolicy(
+        "CanManageMembers",
+        policy => policy.Requirements.Add(new CanManageMembersRequirement())
+    );
+});
+
+// Handlers
+builder.Services.AddScoped<IAuthorizationHandler, CanViewProjectHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanArchiveProjectHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanInviteMembersHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CanManageMembersHandler>();
 // ============================================================================
 // 🌐 CORS
 // ============================================================================
