@@ -101,6 +101,32 @@ public class ProjectService
 
         await _repository.SaveChangesAsync();
     }
+
+    public async Task<IEnumerable<ProjectMemberResponseDto>> GetMembersAsync(
+        Guid projectId,
+        Guid executorUserId)
+    {
+        // 1. Valida existência + acesso ao projeto
+        var project = await _repository.GetByIdAsync(projectId, executorUserId)
+                      ?? throw new DomainException("Projeto não encontrado.");
+
+        // 2. Busca membros
+        var members = await _repository.GetMembersAsync(
+            projectId,
+            executorUserId
+        );
+
+        // 3. Mapeia para DTO
+        return members.Select(m => new ProjectMemberResponseDto
+        {
+            UserId = m.UserId,
+            Name = m.User.Name,
+            Email = m.User.Email,
+            Role = m.Role,
+            JoinedAt = m.JoinedAt
+        });
+    }
+
     
     private static ProjectResponseDto MapToDto(Project project)
     {

@@ -115,13 +115,13 @@ namespace agileTrackerServer.Data
                         .HasDefaultValueSql("NOW()")
                         .IsRequired();
 
-                  // 🔗 Relacionamento SOMENTE com User
-                  entity.HasOne<User>()
+                  // 🔗 ProjectMember → User (COM navigation)
+                  entity.HasOne(pm => pm.User)
                         .WithMany()
                         .HasForeignKey(pm => pm.UserId)
                         .OnDelete(DeleteBehavior.Cascade);
 
-                  // 🔐 Garantia: um usuário só entra uma vez no projeto
+                  // 🔐 Um usuário só pode entrar uma vez por projeto
                   entity.HasIndex(pm => new { pm.ProjectId, pm.UserId })
                         .IsUnique();
 
@@ -130,6 +130,7 @@ namespace agileTrackerServer.Data
                         "\"Role\" IN ('Owner', 'ScrumMaster', 'ProductOwner', 'Developer')"
                   );
             });
+
         }
     }
 }

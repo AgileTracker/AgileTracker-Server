@@ -146,13 +146,15 @@ namespace agileTrackerServer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("agileTrackerServer.Models.Entities.User", null)
+                    b.HasOne("agileTrackerServer.Models.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("agileTrackerServer.Models.Entities.Project", b =>

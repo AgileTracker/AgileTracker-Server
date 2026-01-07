@@ -152,4 +152,20 @@ public class ProjectsController : ControllerBase
 
         return Ok(ResultViewModel.Ok("Membro removido com sucesso."));
     }
+    
+    [HttpGet("{id:guid}/members")]
+    public async Task<IActionResult> GetMembers(Guid id)
+    {
+        var userId = User.GetUserId();
+
+        var members = await _service.GetMembersAsync(id, userId);
+
+        return Ok(
+            ResultViewModel.Ok(
+                "Membros carregados com sucesso.",
+                members
+            )
+        );
+    }
+
 }

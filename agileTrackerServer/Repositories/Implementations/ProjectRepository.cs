@@ -1,6 +1,7 @@
 using agileTrackerServer.Data;
 using agileTrackerServer.Models.Entities;
 using agileTrackerServer.Models.Enums;
+using agileTrackerServer.Models.Exceptions;
 using agileTrackerServer.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -42,6 +43,26 @@ public class ProjectRepository : IProjectRepository
     {
         await _context.Projects.AddAsync(project);
     }
+    
+    public async Task<IEnumerable<ProjectMember>> GetMembersAsync(
+        Guid projectId,
+        Guid userId)
+    {
+        // garante que o usuário faz parte do projeto
+        var hasAccess = await _context.ProjectMembers.AnyAsync(pm =>
+            pm.ProjectId == projectId &&
+            pm.UserId == userId);
+
+        if (!hasAccess)
+            throw new DomainException("Você não tem acesso a este projeto.");
+
+        return await _context.ProjectMembers
+            .Include(pm => pm.User)
+            .Where(pm => pm.ProjectId == projectId)
+            .OrderBy(pm => pm.JoinedAt)
+            .ToListAsync();
+    }
+
 
     public async Task SaveChangesAsync()
     {

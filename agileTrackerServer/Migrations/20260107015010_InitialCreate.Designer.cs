@@ -12,7 +12,7 @@ using agileTrackerServer.Data;
 namespace agileTrackerServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260104022442_InitialCreate")]
+    [Migration("20260107015010_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -149,13 +149,15 @@ namespace agileTrackerServer.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("agileTrackerServer.Models.Entities.User", null)
+                    b.HasOne("agileTrackerServer.Models.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Project");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("agileTrackerServer.Models.Entities.Project", b =>
