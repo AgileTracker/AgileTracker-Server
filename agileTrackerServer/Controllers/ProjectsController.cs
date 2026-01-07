@@ -42,28 +42,17 @@ public class ProjectsController : ControllerBase
     }
 
     // GET api/projects/{id}
-    [Authorize]
+    // GET api/projects/{id}
+    [HttpGet("{id:guid}")]
     [Authorize(Policy = "CanViewProject")]
-    [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Busca um projeto pelo ID.")]
     [ProducesResponseType(typeof(ResultViewModel<ProjectResponseDto>), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ResultViewModel), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ResultViewModel), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetById(string id)
+    public async Task<IActionResult> GetById(Guid id)
     {
-        if (!Guid.TryParse(id, out var projectId))
-        {
-            return BadRequest(
-                ResultViewModel.Fail(
-                    "ID inválido.",
-                    new List<string> { "O ID informado não é um GUID válido." }
-                )
-            );
-        }
-
         var userId = User.GetUserId();
 
-        var project = await _service.GetByIdAsync(projectId, userId);
+        var project = await _service.GetByIdAsync(id, userId);
 
         return Ok(
             ResultViewModel<ProjectResponseDto>.Ok(
