@@ -20,10 +20,10 @@ public class ProjectAuthorizationService
         params MemberRole[] allowedRoles)
     {
         var project = await _projectRepository.GetByIdAsync(projectId, userId)
-                      ?? throw new DomainException("Projeto não encontrado.");
+                      ?? throw new NotFoundException("Projeto não encontrado.");
 
         if (!project.HasPermission(userId, allowedRoles))
-            throw new DomainException("Permissão insuficiente para acessar este recurso.");
+            throw new ForbiddenException("Permissão insuficiente para acessar este recurso.");
 
         return project;
     }

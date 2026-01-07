@@ -21,7 +21,7 @@ public class Project
     public Project(string name, string? description, Guid ownerId)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Nome do projeto é obrigatório.");
+            throw new ValidationException("Nome do projeto é obrigatório.");
 
         if (ownerId == Guid.Empty)
             throw new DomainException("OwnerId inválido.");
@@ -52,7 +52,7 @@ public class Project
         EnsurePermission(executorUserId, MemberRole.Owner);
 
         if (_members.Any(m => m.UserId == newUserId))
-            throw new DomainException("Usuário já é membro do projeto.");
+            throw new ConflictException("Usuário já é membro do projeto.");
 
         _members.Add(new ProjectMember(Id, newUserId, role));
     }
@@ -76,7 +76,7 @@ public class Project
     private void EnsurePermission(Guid userId, params MemberRole[] roles)
     {
         if (!HasPermission(userId, roles))
-            throw new DomainException("Permissão insuficiente para executar esta ação.");
+            throw new ForbiddenException("Permissão insuficiente para executar esta ação.");
     }
 
     public void UpdateDetails(Guid executorUserId, string name, string? description)
@@ -84,7 +84,7 @@ public class Project
         EnsurePermission(executorUserId, MemberRole.Owner);
 
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Nome do projeto é obrigatório.");
+            throw new ValidationException("Nome do projeto é obrigatório.");
 
         Name = name.Trim();
         Description = description?.Trim() ?? string.Empty;

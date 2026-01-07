@@ -23,10 +23,10 @@ public class ProjectInvite
         TimeSpan expiration)
     {
         if (projectId == Guid.Empty)
-            throw new DomainException("Projeto inválido.");
+            throw new ValidationException("Projeto inválido.");
 
         if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("Email inválido.");
+            throw new ValidationException("Email inválido.");
 
         Id = Guid.NewGuid();
         ProjectId = projectId;
@@ -41,7 +41,7 @@ public class ProjectInvite
     public void Accept()
     {
         if (Accepted)
-            throw new DomainException("Convite já foi aceito.");
+            throw new ConflictException("Convite já foi aceito.");
 
         if (DateTime.UtcNow > ExpiresAt)
             throw new DomainException("Convite expirado.");

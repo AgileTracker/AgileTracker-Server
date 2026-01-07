@@ -34,7 +34,7 @@ public class ProjectService
     public async Task<ProjectResponseDto> GetByIdAsync(Guid projectId, Guid userId)
     {
         var project = await _repository.GetByIdAsync(projectId, userId)
-            ?? throw new DomainException("Projeto não encontrado.");
+            ?? throw new NotFoundException("Projeto não encontrado.");
 
         return MapToDto(project);
     }
@@ -62,7 +62,7 @@ public class ProjectService
         Guid executorUserId)
     {
         var project = await _repository.GetByIdAsync(projectId, executorUserId)
-            ?? throw new DomainException("Projeto não encontrado.");
+            ?? throw new NotFoundException("Projeto não encontrado.");
 
         project.UpdateDetails(
             executorUserId,
@@ -78,7 +78,7 @@ public class ProjectService
     public async Task ArchiveAsync(Guid projectId, Guid executorUserId)
     {
         var project = await _repository.GetByIdAsync(projectId, executorUserId)
-            ?? throw new DomainException("Projeto não encontrado.");
+            ?? throw new NotFoundException("Projeto não encontrado.");
 
         project.Archive(executorUserId);
 
@@ -92,7 +92,7 @@ public class ProjectService
         MemberRole role)
     {
         var project = await _repository.GetByIdAsync(projectId, executorUserId)
-                      ?? throw new DomainException("Projeto não encontrado.");
+                      ?? throw new NotFoundException("Projeto não encontrado.");
 
         project.AddMember(executorUserId, newUserId, role);
 
@@ -105,7 +105,7 @@ public class ProjectService
         Guid userId)
     {
         var project = await _repository.GetByIdAsync(projectId, executorUserId)
-                      ?? throw new DomainException("Projeto não encontrado.");
+                      ?? throw new NotFoundException("Projeto não encontrado.");
 
         project.RemoveMember(executorUserId, userId);
 
@@ -118,7 +118,7 @@ public class ProjectService
     {
         // 1. Valida existência + acesso ao projeto
         var project = await _repository.GetByIdAsync(projectId, executorUserId)
-                      ?? throw new DomainException("Projeto não encontrado.");
+                      ?? throw new NotFoundException("Projeto não encontrado.");
 
         // 2. Busca membros
         var members = await _repository.GetMembersAsync(
@@ -145,15 +145,15 @@ public class ProjectService
     {
         // 1) Projeto + permissão (você já valida acesso via GetByIdAsync)
         var project = await _repository.GetByIdAsync(projectId, executorUserId)
-                      ?? throw new DomainException("Projeto não encontrado.");
+                      ?? throw new NotFoundException("Projeto não encontrado.");
 
         // 2) Quem convidou (inviter = executorUser)
         var inviter = await _userRepository.GetByIdAsync(executorUserId)
-                      ?? throw new DomainException("Usuário executor não encontrado.");
+                      ?? throw new NotFoundException("Usuário executor não encontrado.");
 
         // 3) Evita convites duplicados ativos
         if (await _inviteRepository.ExistsActiveInviteAsync(projectId, email))
-            throw new DomainException("Já existe um convite ativo para este email.");
+            throw new ConflictException("Já existe um convite ativo para este email.");
 
         // 4) Cria e persiste (token será utilizado após salvar)
         var invite = new ProjectInvite(
@@ -197,10 +197,10 @@ public class ProjectService
 
         // adiciona membro real
         var project = await _repository.GetByIdAsync(invite.ProjectId, userId)
-                      ?? throw new DomainException("Projeto não encontrado.");
+                      ?? throw new NotFoundException("Projeto não encontrado.");
 
         var userInvited = await _userRepository.GetByEmailAsync(invite.Email)
-                        ?? throw new DomainException("Usuário não encontrado.");
+                        ?? throw new NotFoundException("Usuário não encontrado.");
 
         project.AddMember(
             executorUserId: userId,

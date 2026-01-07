@@ -37,7 +37,7 @@ public class UserService
     public async Task<ResponseUserDto> GetByEmailAsync(string email)
     {
         var user = await _repository.GetByEmailAsync(email)
-                   ?? throw new DomainException("Usuário não encontrado.");
+                   ?? throw new NotFoundException("Usuário não encontrado.");
 
         return MapToDto(user);
     }
@@ -48,10 +48,10 @@ public class UserService
     public async Task<(ResponseUserDto user, string token)> CreateAsync(CreateUserDto dto)
     {
         if (dto.Type == UserType.Admin)
-            throw new DomainException("Não é permitido criar um usuário administrador.");
+            throw new ForbiddenException("Não é permitido criar um usuário administrador.");
 
         if (await _repository.EmailExistsAsync(dto.Email))
-            throw new DomainException("Já existe um usuário com este email.");
+            throw new ConflictException("Já existe um usuário com este email.");
 
         var user = new User(
             dto.Name,

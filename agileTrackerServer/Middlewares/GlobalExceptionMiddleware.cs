@@ -1,6 +1,6 @@
 using agileTrackerServer.Models.Exceptions;
 using agileTrackerServer.Models.ViewModels;
-using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 namespace agileTrackerServer.Middlewares;
@@ -20,61 +20,85 @@ public class GlobalExceptionMiddleware
         {
             await _next(context);
         }
-        catch (DomainException ex)
+        catch (ValidationException ex)
         {
-            await HandleDomainExceptionAsync(context, ex);
+            await WriteAsync(
+                context,
+                StatusCodes.Status422UnprocessableEntity,
+                ResultViewModel.Fail(ex.Message, ex.Errors)
+            );
+        }
+        catch (ConflictException ex)
+        {
+            await WriteAsync(
+                context,
+                StatusCodes.Status409Conflict,
+                ResultViewModel.Fail(ex.Message)
+            );
+        }
+        catch (ForbiddenException ex)
+        {
+            await WriteAsync(
+                context,
+                StatusCodes.Status403Forbidden,
+                ResultViewModel.Fail(ex.Message)
+            );
         }
         catch (UnauthorizedAccessException ex)
         {
-            await HandleUnauthorizedExceptionAsync(context, ex);
+            await WriteAsync(
+                context,
+                StatusCodes.Status401Unauthorized,
+                ResultViewModel.Fail(ex.Message)
+            );
+        }
+        catch (NotFoundException ex)
+        {
+            await WriteAsync(
+                context,
+                StatusCodes.Status404NotFound,
+                ResultViewModel.Fail(ex.Message)
+            );
+        }
+        catch (BadRequestException ex)
+        {
+            await WriteAsync(
+                context,
+                StatusCodes.Status400BadRequest,
+                ResultViewModel.Fail(ex.Message)
+            );
+        }
+        catch (DomainException ex)
+        {
+            // fallback para regras de negócio genéricas que você não categorizou ainda
+            await WriteAsync(
+                context,
+                StatusCodes.Status400BadRequest,
+                ResultViewModel.Fail(ex.Message)
+            );
         }
         catch (Exception)
         {
-            await HandleInternalExceptionAsync(context);
+            await WriteAsync(
+                context,
+                StatusCodes.Status500InternalServerError,
+                ResultViewModel.Fail("Ocorreu um erro interno no servidor.")
+            );
         }
     }
 
-    // ==========================
-    // DOMAIN (404 / 400)
-    // ==========================
-    private static Task HandleDomainExceptionAsync(
+    private static Task WriteAsync(
         HttpContext context,
-        DomainException ex)
+        int statusCode,
+        ResultViewModel result)
     {
-        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        // Se algo já escreveu no response, não tenta reescrever
+        if (context.Response.HasStarted)
+            return Task.CompletedTask;
+
+        context.Response.Clear();
+        context.Response.StatusCode = statusCode;
         context.Response.ContentType = "application/json";
-
-        var result = ResultViewModel.Fail(ex.Message);
-
-        return context.Response.WriteAsJsonAsync(result);
-    }
-
-    // ==========================
-    // AUTH (401)
-    // ==========================
-    private static Task HandleUnauthorizedExceptionAsync(
-        HttpContext context,
-        UnauthorizedAccessException ex)
-    {
-        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        context.Response.ContentType = "application/json";
-
-        var result = ResultViewModel.Fail(ex.Message);
-
-        return context.Response.WriteAsJsonAsync(result);
-    }
-
-    // ==========================
-    // INTERNAL (500)
-    // ==========================
-    private static Task HandleInternalExceptionAsync(HttpContext context)
-    {
-        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-        context.Response.ContentType = "application/json";
-
-        var result = ResultViewModel.Fail(
-            "Ocorreu um erro interno no servidor."
-        );
 
         return context.Response.WriteAsJsonAsync(result);
     }

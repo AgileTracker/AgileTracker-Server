@@ -33,13 +33,13 @@ public class User
         string? avatarUrl = null)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Nome do usuário é obrigatório.");
+            throw new ValidationException("Nome do usuário é obrigatório.");
 
         if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("Email do usuário é obrigatório.");
+            throw new ValidationException("Email do usuário é obrigatório.");
 
         if (string.IsNullOrWhiteSpace(passwordHash))
-            throw new DomainException("Senha do usuário é obrigatória.");
+            throw new ValidationException("Senha do usuário é obrigatória.");
 
         Id = Guid.NewGuid();
         Name = name.Trim();
@@ -57,7 +57,7 @@ public class User
     public void UpdateProfile(string name, string? avatarUrl)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Nome do usuário é obrigatório.");
+            throw new ValidationException("Nome do usuário é obrigatório.");
 
         Name = name.Trim();
         AvatarUrl = avatarUrl?.Trim() ?? string.Empty;
@@ -67,7 +67,7 @@ public class User
     public void ChangePassword(string newPasswordHash)
     {
         if (string.IsNullOrWhiteSpace(newPasswordHash))
-            throw new DomainException("Senha inválida.");
+            throw new ValidationException("Senha inválida.");
 
         PasswordHash = newPasswordHash;
         UpdatedAt = DateTime.UtcNow;

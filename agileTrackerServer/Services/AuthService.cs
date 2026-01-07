@@ -32,10 +32,10 @@ public class AuthService
         string password)
     {
         var user = await _repository.GetByEmailAsync(email)
-                   ?? throw new DomainException("Credenciais inválidas.");
+                   ?? throw new UnauthorizedAccessException("Credenciais inválidas.");
 
         if (!_hasher.VerifyPassword(password, user.PasswordHash))
-            throw new DomainException("Credenciais inválidas.");
+            throw new UnauthorizedAccessException("Credenciais inválidas.");
 
         var token = _tokenService.GenerateToken(user);
 
@@ -50,10 +50,10 @@ public class AuthService
         var userId = user.GetUserId();
 
         var typeClaim = user.FindFirstValue("Type")
-                        ?? throw new DomainException("Tipo do usuário não encontrado no token.");
+                        ?? throw new ForbiddenException("Tipo do usuário não encontrado no token.");
 
         if (!Enum.TryParse<UserType>(typeClaim, true, out var userType))
-            throw new DomainException("Tipo do usuário inválido.");
+            throw new ForbiddenException("Tipo do usuário inválido.");
 
         return new ResponseUserDto
         {
