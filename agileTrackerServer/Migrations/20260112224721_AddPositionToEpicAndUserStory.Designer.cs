@@ -12,8 +12,8 @@ using agileTrackerServer.Data;
 namespace agileTrackerServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260108024919_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260112224721_AddPositionToEpicAndUserStory")]
+    partial class AddPositionToEpicAndUserStory
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -28,10 +28,11 @@ namespace agileTrackerServer.Migrations
 
             modelBuilder.Entity("agileTrackerServer.Models.Entities.Epic", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BusinessValue")
                         .IsRequired()
@@ -58,6 +59,9 @@ namespace agileTrackerServer.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Priority")
                         .ValueGeneratedOnAdd()
@@ -280,10 +284,11 @@ namespace agileTrackerServer.Migrations
 
             modelBuilder.Entity("agileTrackerServer.Models.Entities.UserStory", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AcceptanceCriteria")
                         .IsRequired()
@@ -318,13 +323,16 @@ namespace agileTrackerServer.Migrations
                     b.Property<int?>("Effort")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("EpicId")
-                        .HasColumnType("uuid");
+                    b.Property<int>("EpicId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Persona")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Priority")
                         .ValueGeneratedOnAdd()

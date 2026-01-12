@@ -5,8 +5,8 @@ namespace agileTrackerServer.Models.Entities;
 
 public class UserStory
 {
-    public Guid Id { get; private set; }
-    public Guid EpicId { get; private set; }
+    public int Id { get; private set; }
+    public int EpicId { get; private set; }
 
     public string Title { get; private set; } = string.Empty;
     public string Persona { get; private set; } = string.Empty;
@@ -15,25 +15,26 @@ public class UserStory
     public string AcceptanceCriteria { get; private set; } = string.Empty;
     public UserStoryComplexity Complexity { get; private set; } = UserStoryComplexity.Medium;
 
-    public int? Effort { get; private set; } // story points
+    public int? Effort { get; private set; }
     public string Dependencies { get; private set; } = string.Empty;
 
     public int Priority { get; private set; } = 0;
     public BusinessValue BusinessValue { get; private set; } = BusinessValue.Medium;
     public UserStoryStatus Status { get; private set; } = UserStoryStatus.Draft;
 
+    public int Position { get; private set; } // ✅ sem set público
+
     public Guid? AssigneeId { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    // Navigation
     public Epic Epic { get; private set; } = null!;
 
     private UserStory() { } // EF
 
     internal UserStory(
-        Guid epicId,
+        int epicId,
         string title,
         string persona,
         string description,
@@ -44,9 +45,10 @@ public class UserStory
         int priority,
         BusinessValue businessValue,
         UserStoryStatus status,
+        int position,
         Guid? assigneeId)
     {
-        if (epicId == Guid.Empty)
+        if (epicId <= 0)
             throw new DomainException("EpicId inválido.");
 
         if (string.IsNullOrWhiteSpace(title))
@@ -58,7 +60,9 @@ public class UserStory
         if (string.IsNullOrWhiteSpace(description))
             throw new ValidationException("Descrição é obrigatória.");
 
-        Id = Guid.NewGuid();
+        if (position < 0)
+            throw new ValidationException("Position inválida.");
+
         EpicId = epicId;
 
         Title = title.Trim();
@@ -75,6 +79,7 @@ public class UserStory
         BusinessValue = businessValue;
         Status = status;
 
+        Position = position;
         AssigneeId = assigneeId;
 
         CreatedAt = DateTime.UtcNow;
@@ -92,6 +97,7 @@ public class UserStory
         int priority,
         BusinessValue businessValue,
         UserStoryStatus status,
+        int position,
         Guid? assigneeId)
     {
         if (string.IsNullOrWhiteSpace(title))
@@ -102,6 +108,9 @@ public class UserStory
 
         if (string.IsNullOrWhiteSpace(description))
             throw new ValidationException("Descrição é obrigatória.");
+
+        if (position < 0)
+            throw new ValidationException("Position inválida.");
 
         Title = title.Trim();
         Persona = persona.Trim();
@@ -117,6 +126,7 @@ public class UserStory
         BusinessValue = businessValue;
         Status = status;
 
+        Position = position;
         AssigneeId = assigneeId;
 
         UpdatedAt = DateTime.UtcNow;

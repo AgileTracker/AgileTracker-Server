@@ -4,7 +4,7 @@ namespace agileTrackerServer.Models.Dtos.Backlog;
 
 public class EpicResponseDto
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public Guid ProductBacklogId { get; set; }
 
     public string Name { get; set; } = string.Empty;
@@ -12,7 +12,7 @@ public class EpicResponseDto
 
     public BusinessValue BusinessValue { get; set; }
     public EpicStatus Status { get; set; }
-
+    public int Position { get; set; }
     public int Priority { get; set; }
     public string Color { get; set; } = "#3498db";
 

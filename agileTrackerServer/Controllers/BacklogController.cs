@@ -34,10 +34,10 @@ public class BacklogController : ControllerBase
     }
 
     // POST api/projects/{projectId}/backlog/epics/{epicId}/stories
-    [HttpPost("epics/{epicId:guid}/stories")]
+    [HttpPost("epics/{epicId:int}/stories")]
     [Authorize(Policy = "CanViewProject")]
     [SwaggerOperation(Summary = "Cria uma user story dentro de um épico do projeto.")]
-    public async Task<IActionResult> CreateStory(Guid projectId, Guid epicId, [FromBody] CreateUserStoryDto dto)
+    public async Task<IActionResult> CreateStory(Guid projectId, int epicId, [FromBody] CreateUserStoryDto dto)
     {
         var userId = User.GetUserId();
 
@@ -58,5 +58,35 @@ public class BacklogController : ControllerBase
         var result = await _service.GetBacklogByProjectIdAsync(projectId, userId);
 
         return Ok(result);
+    }
+    
+    // PATCH api/projects/{projectId}/backlog
+    [HttpPatch]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> UpdateOverview(Guid projectId, [FromBody] UpdateBacklogOverviewDto dto)
+    {
+        var userId = User.GetUserId();
+        await _service.UpdateOverviewAsync(projectId, userId, dto);
+        return Ok(ResultViewModel.Ok("Overview atualizado com sucesso."));
+    }
+
+    // PATCH api/projects/{projectId}/backlog/epics/{epicId}
+    [HttpPatch("epics/{epicId:int}")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> UpdateEpic(Guid projectId, int epicId, [FromBody] UpdateEpicDto dto)
+    {
+        var userId = User.GetUserId();
+        await _service.UpdateEpicAsync(projectId, epicId, userId, dto);
+        return Ok(ResultViewModel.Ok("Épico atualizado com sucesso."));
+    }
+
+    // PATCH api/projects/{projectId}/backlog/stories/{storyId}
+    [HttpPatch("stories/{storyId:int}")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> UpdateStory(Guid projectId, int storyId, [FromBody] UpdateUserStoryDto dto)
+    {
+        var userId = User.GetUserId();
+        await _service.UpdateUserStoryAsync(projectId, storyId, userId, dto);
+        return Ok(ResultViewModel.Ok("User story atualizada com sucesso."));
     }
 }

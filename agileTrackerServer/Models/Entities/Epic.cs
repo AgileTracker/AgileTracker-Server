@@ -5,7 +5,7 @@ namespace agileTrackerServer.Models.Entities;
 
 public class Epic
 {
-    public Guid Id { get; private set; }
+    public int Id { get; private set; }
     public Guid ProductBacklogId { get; private set; }
 
     public string Name { get; private set; } = string.Empty;
@@ -14,13 +14,13 @@ public class Epic
     public BusinessValue BusinessValue { get; private set; } = BusinessValue.Medium;
     public EpicStatus Status { get; private set; } = EpicStatus.Draft;
 
+    public int Position { get; private set; } // ✅ não-null e controlado
     public int Priority { get; private set; } = 0;
     public string Color { get; private set; } = "#3498db";
 
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
 
-    // Navigation
     public ProductBacklog ProductBacklog { get; private set; } = null!;
 
     private readonly List<UserStory> _userStories = new();
@@ -34,6 +34,7 @@ public class Epic
         string? description,
         BusinessValue businessValue,
         EpicStatus status,
+        int position,
         int priority,
         string? color)
     {
@@ -43,16 +44,18 @@ public class Epic
         if (string.IsNullOrWhiteSpace(name))
             throw new ValidationException("Nome do épico é obrigatório.");
 
-        Id = Guid.NewGuid();
-        ProductBacklogId = productBacklogId;
+        if (position < 0)
+            throw new ValidationException("Position inválida.");
 
+        ProductBacklogId = productBacklogId;
         Name = name.Trim();
         Description = description?.Trim() ?? string.Empty;
 
         BusinessValue = businessValue;
         Status = status;
-        Priority = priority;
 
+        Position = position;
+        Priority = priority;
         Color = string.IsNullOrWhiteSpace(color) ? "#3498db" : color.Trim();
 
         CreatedAt = DateTime.UtcNow;
@@ -64,16 +67,23 @@ public class Epic
         string? description,
         BusinessValue businessValue,
         EpicStatus status,
+        int position,
         int priority,
         string? color)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ValidationException("Nome do épico é obrigatório.");
 
+        if (position < 0)
+            throw new ValidationException("Position inválida.");
+
         Name = name.Trim();
         Description = description?.Trim() ?? string.Empty;
+
         BusinessValue = businessValue;
         Status = status;
+
+        Position = position;
         Priority = priority;
 
         if (!string.IsNullOrWhiteSpace(color))

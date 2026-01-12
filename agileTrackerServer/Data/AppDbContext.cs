@@ -1,4 +1,5 @@
 using agileTrackerServer.Models.Entities;
+using agileTrackerServer.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace agileTrackerServer.Data
@@ -214,60 +215,42 @@ namespace agileTrackerServer.Data
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id)
-                    .HasDefaultValueSql("uuid_generate_v4()");
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityByDefaultColumn(); // Npgsql identity
 
                 entity.Property(e => e.ProductBacklogId).IsRequired();
 
-                entity.Property(e => e.Name)
-                    .HasMaxLength(255)
-                    .IsRequired();
-
-                entity.Property(e => e.Description)
-                    .HasColumnType("text");
+                entity.Property(e => e.Name).HasMaxLength(255).IsRequired();
+                entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.BusinessValue)
-                    .HasConversion<string>()
-                    .HasMaxLength(20)
-                    .IsRequired();
+                      .HasConversion<string>()
+                      .HasMaxLength(20)
+                      .IsRequired();
 
                 entity.Property(e => e.Status)
-                    .HasConversion<string>()
-                    .HasMaxLength(50)
-                    .IsRequired();
+                      .HasConversion<string>()
+                      .HasMaxLength(50)
+                      .IsRequired();
+                
+                entity.Property(e => e.Position)
+                      .IsRequired();
+                
+                entity.Property(e => e.Priority).HasDefaultValue(0).IsRequired();
+                entity.Property(e => e.Color).HasMaxLength(7).HasDefaultValue("#3498db").IsRequired();
 
-                entity.Property(e => e.Priority)
-                    .HasDefaultValue(0)
-                    .IsRequired();
-
-                entity.Property(e => e.Color)
-                    .HasMaxLength(7)
-                    .HasDefaultValue("#3498db")
-                    .IsRequired();
-
-                entity.Property(e => e.CreatedAt)
-                    .HasDefaultValueSql("NOW()")
-                    .IsRequired();
-
-                entity.Property(e => e.UpdatedAt)
-                    .HasDefaultValueSql("NOW()")
-                    .IsRequired();
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()").IsRequired();
+                entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()").IsRequired();
 
                 entity.HasIndex(e => e.ProductBacklogId);
 
                 entity.HasOne(e => e.ProductBacklog)
-                    .WithMany(pb => (IEnumerable<Epic>)pb.Epics) // EF precisa da nav; se der conflito, use pb => pb.Epics no seu código
+                    .WithMany(pb => pb.Epics)
                     .HasForeignKey(e => e.ProductBacklogId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasCheckConstraint(
-                    "CK_Epic_BusinessValue",
-                    "\"BusinessValue\" IN ('High','Medium','Low')"
-                );
-
-                entity.HasCheckConstraint(
-                    "CK_Epic_Status",
-                    "\"Status\" IN ('Draft','Active','Completed')"
-                );
+                entity.HasCheckConstraint("CK_Epic_BusinessValue", "\"BusinessValue\" IN ('High','Medium','Low')");
+                entity.HasCheckConstraint("CK_Epic_Status", "\"Status\" IN ('Draft','Active','Completed')");
             });
 
             modelBuilder.Entity<UserStory>(entity =>
@@ -276,80 +259,55 @@ namespace agileTrackerServer.Data
                 entity.HasKey(us => us.Id);
 
                 entity.Property(us => us.Id)
-                    .HasDefaultValueSql("uuid_generate_v4()");
+                    .ValueGeneratedOnAdd()
+                    .UseIdentityByDefaultColumn();
 
                 entity.Property(us => us.EpicId).IsRequired();
 
-                entity.Property(us => us.Title)
-                    .HasMaxLength(255)
-                    .IsRequired();
+                entity.Property(us => us.Title).HasMaxLength(255).IsRequired();
+                entity.Property(us => us.Persona).HasMaxLength(100).IsRequired();
 
-                entity.Property(us => us.Persona)
-                    .HasMaxLength(100)
-                    .IsRequired();
-
-                entity.Property(us => us.Description)
-                    .HasColumnType("text")
-                    .IsRequired();
-
-                entity.Property(us => us.AcceptanceCriteria)
-                    .HasColumnType("text");
+                entity.Property(us => us.Description).HasColumnType("text").IsRequired();
+                entity.Property(us => us.AcceptanceCriteria).HasColumnType("text");
 
                 entity.Property(us => us.Complexity)
-                    .HasConversion<string>()
-                    .HasMaxLength(20)
-                    .IsRequired();
+                      .HasConversion<string>()
+                      .HasMaxLength(20)
+                      .IsRequired();
 
                 entity.Property(us => us.Effort);
+                entity.Property(us => us.Dependencies).HasColumnType("text");
 
-                entity.Property(us => us.Dependencies)
-                    .HasColumnType("text");
-
-                entity.Property(us => us.Priority)
-                    .HasDefaultValue(0)
-                    .IsRequired();
+                entity.Property(us => us.Priority).HasDefaultValue(0).IsRequired();
 
                 entity.Property(us => us.BusinessValue)
-                    .HasConversion<string>()
-                    .HasMaxLength(20)
-                    .IsRequired();
+                      .HasConversion<string>()
+                      .HasMaxLength(20)
+                      .IsRequired();
 
                 entity.Property(us => us.Status)
-                    .HasConversion<string>()
-                    .HasMaxLength(50)
-                    .IsRequired();
+                      .HasConversion<string>()
+                      .HasMaxLength(50)
+                      .IsRequired();
+
+                entity.Property(us => us.Position)
+                      .IsRequired();
 
                 entity.Property(us => us.AssigneeId);
 
-                entity.Property(us => us.CreatedAt)
-                    .HasDefaultValueSql("NOW()")
-                    .IsRequired();
-
-                entity.Property(us => us.UpdatedAt)
-                    .HasDefaultValueSql("NOW()")
-                    .IsRequired();
+                entity.Property(us => us.CreatedAt).HasDefaultValueSql("NOW()").IsRequired();
+                entity.Property(us => us.UpdatedAt).HasDefaultValueSql("NOW()").IsRequired();
 
                 entity.HasIndex(us => us.EpicId);
 
                 entity.HasOne(us => us.Epic)
-                    .WithMany(e => (IEnumerable<UserStory>)e.UserStories)
+                    .WithMany(e => e.UserStories)
                     .HasForeignKey(us => us.EpicId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasCheckConstraint(
-                    "CK_UserStory_Complexity",
-                    "\"Complexity\" IN ('Low','Medium','High','VeryHigh')"
-                );
-
-                entity.HasCheckConstraint(
-                    "CK_UserStory_BusinessValue",
-                    "\"BusinessValue\" IN ('High','Medium','Low')"
-                );
-
-                entity.HasCheckConstraint(
-                    "CK_UserStory_Status",
-                    "\"Status\" IN ('Draft','Ready','InProgress','Done')"
-                );
+                entity.HasCheckConstraint("CK_UserStory_Complexity", "\"Complexity\" IN ('Low','Medium','High','VeryHigh')");
+                entity.HasCheckConstraint("CK_UserStory_BusinessValue", "\"BusinessValue\" IN ('High','Medium','Low')");
+                entity.HasCheckConstraint("CK_UserStory_Status", "\"Status\" IN ('Draft','Ready','InProgress','Done')");
             });
         }
     }

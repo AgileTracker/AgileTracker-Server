@@ -17,6 +17,5 @@ public class CreateUserStoryDto
 
     public BusinessValue BusinessValue { get; set; } = BusinessValue.Medium;
     public UserStoryStatus Status { get; set; } = UserStoryStatus.Draft;
-
     public Guid? AssigneeId { get; set; }
 }
