@@ -12,8 +12,8 @@ using agileTrackerServer.Data;
 namespace agileTrackerServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260110182531_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260113211217_MakeEpicPositionUniqueDeferrable")]
+    partial class MakeEpicPositionUniqueDeferrable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,6 +60,9 @@ namespace agileTrackerServer.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Priority")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -81,6 +84,9 @@ namespace agileTrackerServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductBacklogId");
+
+                    b.HasIndex("ProductBacklogId", "Position")
+                        .IsUnique();
 
                     b.ToTable("epics", null, t =>
                         {
@@ -328,6 +334,9 @@ namespace agileTrackerServer.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Priority")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
@@ -351,6 +360,9 @@ namespace agileTrackerServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EpicId");
+
+                    b.HasIndex("EpicId", "Position")
+                        .IsUnique();
 
                     b.ToTable("user_stories", null, t =>
                         {

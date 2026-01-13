@@ -12,8 +12,8 @@ using agileTrackerServer.Data;
 namespace agileTrackerServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260112224721_AddPositionToEpicAndUserStory")]
-    partial class AddPositionToEpicAndUserStory
+    [Migration("20260113011251_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,6 +84,9 @@ namespace agileTrackerServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ProductBacklogId");
+
+                    b.HasIndex("ProductBacklogId", "Position")
+                        .IsUnique();
 
                     b.ToTable("epics", null, t =>
                         {
@@ -357,6 +360,9 @@ namespace agileTrackerServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EpicId");
+
+                    b.HasIndex("EpicId", "Position")
+                        .IsUnique();
 
                     b.ToTable("user_stories", null, t =>
                         {

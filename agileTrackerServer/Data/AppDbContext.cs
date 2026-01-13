@@ -241,7 +241,11 @@ namespace agileTrackerServer.Data
 
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()").IsRequired();
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()").IsRequired();
+                
+                entity.HasIndex(e => new { e.ProductBacklogId, e.Position })
+                      .IsUnique();
 
+                // opcional (consulta): ordenar por backlog
                 entity.HasIndex(e => e.ProductBacklogId);
 
                 entity.HasOne(e => e.ProductBacklog)
@@ -298,7 +302,10 @@ namespace agileTrackerServer.Data
                 entity.Property(us => us.CreatedAt).HasDefaultValueSql("NOW()").IsRequired();
                 entity.Property(us => us.UpdatedAt).HasDefaultValueSql("NOW()").IsRequired();
 
-                entity.HasIndex(us => us.EpicId);
+                entity.HasIndex(s => new { s.EpicId, s.Position })
+                      .IsUnique();
+
+                entity.HasIndex(s => s.EpicId);
 
                 entity.HasOne(us => us.Epic)
                     .WithMany(e => e.UserStories)

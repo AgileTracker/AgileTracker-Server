@@ -89,4 +89,30 @@ public class BacklogController : ControllerBase
         await _service.UpdateUserStoryAsync(projectId, storyId, userId, dto);
         return Ok(ResultViewModel.Ok("User story atualizada com sucesso."));
     }
+    [HttpPatch("epics/reorder")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> ReorderEpic(Guid projectId, [FromBody] ReorderEpicDto dto)
+    {
+        var userId = User.GetUserId();
+        await _service.ReorderEpicAsync(projectId, userId, dto);
+        return Ok(ResultViewModel.Ok("Épico reordenado com sucesso."));
+    }
+
+    [HttpPatch("stories/reorder")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> ReorderStory(Guid projectId, [FromBody] ReorderUserStoryDto dto)
+    {
+        var userId = User.GetUserId();
+        await _service.ReorderUserStoryAsync(projectId, userId, dto);
+        return Ok(ResultViewModel.Ok("User story reordenada com sucesso."));
+    }
+    
+    [HttpPatch("stories/move")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> MoveStory(Guid projectId, [FromBody] MoveUserStoryDto dto)
+    {
+        var userId = User.GetUserId();
+        await _service.MoveUserStoryAsync(projectId, userId, dto);
+        return Ok(ResultViewModel.Ok("User story movida com sucesso."));
+    }
 }

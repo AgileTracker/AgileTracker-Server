@@ -135,6 +135,7 @@ namespace agileTrackerServer.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     BusinessValue = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Position = table.Column<int>(type: "integer", nullable: false),
                     Priority = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     Color = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false, defaultValue: "#3498db"),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()"),
@@ -170,6 +171,7 @@ namespace agileTrackerServer.Migrations
                     Priority = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     BusinessValue = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Position = table.Column<int>(type: "integer", nullable: false),
                     AssigneeId = table.Column<Guid>(type: "uuid", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()"),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()")
@@ -192,6 +194,12 @@ namespace agileTrackerServer.Migrations
                 name: "IX_epics_ProductBacklogId",
                 table: "epics",
                 column: "ProductBacklogId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_epics_ProductBacklogId_Position",
+                table: "epics",
+                columns: new[] { "ProductBacklogId", "Position" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_product_backlogs_ProjectId",
@@ -226,6 +234,12 @@ namespace agileTrackerServer.Migrations
                 name: "IX_user_stories_EpicId",
                 table: "user_stories",
                 column: "EpicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_stories_EpicId_Position",
+                table: "user_stories",
+                columns: new[] { "EpicId", "Position" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_Email",
