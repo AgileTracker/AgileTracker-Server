@@ -238,14 +238,17 @@ namespace agileTrackerServer.Data
                 
                 entity.Property(e => e.Priority).HasDefaultValue(0).IsRequired();
                 entity.Property(e => e.Color).HasMaxLength(7).HasDefaultValue("#3498db").IsRequired();
+                entity.Property(e => e.IsArchived)
+                      .HasDefaultValue(false)
+                      .IsRequired();
 
+                entity.Property(e => e.ArchivedAt).IsRequired(false);
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("NOW()").IsRequired();
                 entity.Property(e => e.UpdatedAt).HasDefaultValueSql("NOW()").IsRequired();
-                
+
+                entity.HasIndex(e => new { e.ProductBacklogId, e.IsArchived });
                 entity.HasIndex(e => new { e.ProductBacklogId, e.Position })
                       .IsUnique();
-
-                // opcional (consulta): ordenar por backlog
                 entity.HasIndex(e => e.ProductBacklogId);
 
                 entity.HasOne(e => e.ProductBacklog)
@@ -298,13 +301,18 @@ namespace agileTrackerServer.Data
                       .IsRequired();
 
                 entity.Property(us => us.AssigneeId);
+                entity.Property(e => e.IsArchived)
+                      .HasDefaultValue(false)
+                      .IsRequired();
 
+                entity.Property(e => e.ArchivedAt).IsRequired(false);
                 entity.Property(us => us.CreatedAt).HasDefaultValueSql("NOW()").IsRequired();
                 entity.Property(us => us.UpdatedAt).HasDefaultValueSql("NOW()").IsRequired();
 
                 entity.HasIndex(s => new { s.EpicId, s.Position })
                       .IsUnique();
 
+                entity.HasIndex(s => new { s.EpicId, s.IsArchived });
                 entity.HasIndex(s => s.EpicId);
 
                 entity.HasOne(us => us.Epic)

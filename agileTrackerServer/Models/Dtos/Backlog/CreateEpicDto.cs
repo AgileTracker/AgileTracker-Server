@@ -10,4 +10,5 @@ public class CreateEpicDto
     public EpicStatus Status { get; set; } = EpicStatus.Draft;
     public int Priority { get; set; } = 0;
     public string? Color { get; set; }
+    public bool IsArchived { get; set; } = false;
 }

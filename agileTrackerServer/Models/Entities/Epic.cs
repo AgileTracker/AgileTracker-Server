@@ -14,9 +14,11 @@ public class Epic
     public BusinessValue BusinessValue { get; private set; } = BusinessValue.Medium;
     public EpicStatus Status { get; private set; } = EpicStatus.Draft;
 
-    public int Position { get; private set; } // ✅ não-null e controlado
+    public int Position { get; private set; }
     public int Priority { get; private set; } = 0;
     public string Color { get; private set; } = "#3498db";
+    public bool IsArchived { get; private set; }
+    public DateTime? ArchivedAt { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
@@ -36,7 +38,9 @@ public class Epic
         EpicStatus status,
         int position,
         int priority,
-        string? color)
+        string? color,
+        bool isArchived,
+        DateTime? archivedAt)
     {
         if (productBacklogId == Guid.Empty)
             throw new DomainException("ProductBacklogId inválido.");
@@ -57,6 +61,9 @@ public class Epic
         Position = position;
         Priority = priority;
         Color = string.IsNullOrWhiteSpace(color) ? "#3498db" : color.Trim();
+        
+        IsArchived = isArchived;
+        ArchivedAt = archivedAt;
 
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
@@ -89,6 +96,22 @@ public class Epic
         if (!string.IsNullOrWhiteSpace(color))
             Color = color.Trim();
 
+        UpdatedAt = DateTime.UtcNow;
+    }
+    
+    public void Archive()
+    {
+        if (IsArchived) return;
+        IsArchived = true;
+        ArchivedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Restore()
+    {
+        if (!IsArchived) return;
+        IsArchived = false;
+        ArchivedAt = null;
         UpdatedAt = DateTime.UtcNow;
     }
 }

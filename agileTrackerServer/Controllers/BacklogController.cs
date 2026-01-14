@@ -115,4 +115,40 @@ public class BacklogController : ControllerBase
         await _service.MoveUserStoryAsync(projectId, userId, dto);
         return Ok(ResultViewModel.Ok("User story movida com sucesso."));
     }
+    
+    [HttpPatch("epics/{epicId:int}/archive")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> ArchiveEpic(Guid projectId, int epicId)
+    {
+        var userId = User.GetUserId();
+        await _service.ArchiveEpicAsync(projectId, epicId, userId);
+        return Ok(ResultViewModel.Ok("Épico arquivado com sucesso."));
+    }
+    
+    [HttpPatch("epics/{epicId:int}/restore")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> RestoreEpic(Guid projectId, int epicId)
+    {
+        var userId = User.GetUserId();
+        await _service.RestoreEpicAsync(projectId, epicId, userId);
+        return Ok(ResultViewModel.Ok("Épico restaurado com sucesso."));
+    }
+    
+    [HttpPatch("stories/{storyId:int}/archive")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> ArchiveStory(Guid projectId, int storyId)
+    {
+        var userId = User.GetUserId();
+        await _service.ArchiveUserStoryAsync(projectId, storyId, userId);
+        return Ok(ResultViewModel.Ok("User story arquivada com sucesso."));
+    }
+    
+    [HttpPatch("stories/{storyId:int}/restore")]
+    [Authorize(Policy = "CanViewProject")]
+    public async Task<IActionResult> RestoreStory(Guid projectId, int storyId)
+    {
+        var userId = User.GetUserId();
+        await _service.RestoreUserStoryAsync(projectId, storyId, userId);
+        return Ok(ResultViewModel.Ok("User story restaurada com sucesso."));
+    }
 }

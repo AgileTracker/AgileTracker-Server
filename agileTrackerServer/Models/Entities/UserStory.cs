@@ -25,6 +25,9 @@ public class UserStory
     public int Position { get; private set; } // ✅ sem set público
 
     public Guid? AssigneeId { get; private set; }
+    
+    public bool IsArchived { get; private set; }
+    public DateTime? ArchivedAt { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
     public DateTime UpdatedAt { get; private set; }
@@ -46,7 +49,9 @@ public class UserStory
         BusinessValue businessValue,
         UserStoryStatus status,
         int position,
-        Guid? assigneeId)
+        Guid? assigneeId,
+        bool isArchived,
+        DateTime? archivedAt)
     {
         if (epicId <= 0)
             throw new DomainException("EpicId inválido.");
@@ -81,7 +86,10 @@ public class UserStory
 
         Position = position;
         AssigneeId = assigneeId;
-
+        
+        IsArchived = isArchived;
+        ArchivedAt = archivedAt;
+        
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
     }
@@ -129,6 +137,22 @@ public class UserStory
         Position = position;
         AssigneeId = assigneeId;
 
+        UpdatedAt = DateTime.UtcNow;
+    }
+    
+    public void Archive()
+    {
+        if (IsArchived) return;
+        IsArchived = true;
+        ArchivedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void Restore()
+    {
+        if (!IsArchived) return;
+        IsArchived = false;
+        ArchivedAt = null;
         UpdatedAt = DateTime.UtcNow;
     }
 }

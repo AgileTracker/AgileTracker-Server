@@ -17,8 +17,8 @@ public class ProductBacklogRepository : IProductBacklogRepository
     public async Task<ProductBacklog?> GetByProjectIdAsync(Guid projectId)
     {
         return await _context.ProductBacklogs
-            .Include(pb => pb.Epics)
-            .ThenInclude(e => e.UserStories)
+            .Include(pb => pb.Epics.Where(e => !e.IsArchived))
+            .ThenInclude(e => e.UserStories.Where(s => !s.IsArchived))
             .FirstOrDefaultAsync(pb => pb.ProjectId == projectId);
     }
 

@@ -15,7 +15,10 @@ public class EpicRepository : IEpicRepository
     }
 
     public async Task<Epic?> GetByIdAsync(int epicId)
-        => await _context.Epics.FirstOrDefaultAsync(e => e.Id == epicId);
+        => await _context.Epics.FirstOrDefaultAsync(e => e.Id == epicId && !e.IsArchived);
+    
+    public Task<Epic?> GetByIdIncludingArchivedAsync(int id)
+        => _context.Epics.FirstOrDefaultAsync(e => e.Id == id);
 
     public async Task AddAsync(Epic epic)
         => await _context.Epics.AddAsync(epic);
@@ -23,7 +26,7 @@ public class EpicRepository : IEpicRepository
     public async Task<List<Epic>> GetByBacklogIdAsync(Guid productBacklogId)
     {
         return await _context.Epics
-            .Where(e => e.ProductBacklogId == productBacklogId)
+            .Where(e => e.ProductBacklogId == productBacklogId && !e.IsArchived)
             .OrderBy(e => e.Position)
             .ToListAsync();
     }
@@ -31,7 +34,7 @@ public class EpicRepository : IEpicRepository
     public async Task<int> GetNextPositionAsync(Guid productBacklogId)
     {
         var max = await _context.Epics
-            .Where(e => e.ProductBacklogId == productBacklogId)
+            .Where(e => e.ProductBacklogId == productBacklogId && !e.IsArchived)
             .Select(e => (int?)e.Position)
             .MaxAsync();
 
@@ -48,7 +51,8 @@ public class EpicRepository : IEpicRepository
             await _context.Epics
                 .Where(e => e.ProductBacklogId == productBacklogId
                             && e.Position >= toPosition
-                            && e.Position < fromPosition)
+                            && e.Position < fromPosition
+                            && !e.IsArchived)
                 .ExecuteUpdateAsync(setters =>
                     setters.SetProperty(e => e.Position, e => e.Position + 1));
             return;
@@ -58,7 +62,8 @@ public class EpicRepository : IEpicRepository
         await _context.Epics
             .Where(e => e.ProductBacklogId == productBacklogId
                         && e.Position > fromPosition
-                        && e.Position <= toPosition)
+                        && e.Position <= toPosition
+                        && !e.IsArchived)
             .ExecuteUpdateAsync(setters =>
                 setters.SetProperty(e => e.Position, e => e.Position - 1));
     }
@@ -66,7 +71,7 @@ public class EpicRepository : IEpicRepository
     public async Task<int> GetMaxPositionAsync(Guid productBacklogId)
     {
         var max = await _context.Epics
-            .Where(e => e.ProductBacklogId == productBacklogId)
+            .Where(e => e.ProductBacklogId == productBacklogId && !e.IsArchived)
             .Select(e => (int?)e.Position)
             .MaxAsync();
 
@@ -76,8 +81,28 @@ public class EpicRepository : IEpicRepository
     public async Task SetPositionAsync(int epicId, int position)
     {
         await _context.Epics
-            .Where(e => e.Id == epicId)
+            .Where(e => e.Id == epicId && !e.IsArchived)
             .ExecuteUpdateAsync(s => s.SetProperty(e => e.Position, position));
+    }
+    
+    public async Task ArchiveAsync(int epicId)
+    {
+        await _context.Epics
+            .Where(e => e.Id == epicId && !e.IsArchived)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(e => e.IsArchived, true)
+                .SetProperty(e => e.ArchivedAt, DateTime.UtcNow)
+                .SetProperty(e => e.UpdatedAt, DateTime.UtcNow));
+    }
+
+    public async Task RestoreAsync(int epicId)
+    {
+        await _context.Epics
+            .Where(e => e.Id == epicId && e.IsArchived)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(e => e.IsArchived, false)
+                .SetProperty(e => e.ArchivedAt, (DateTime?)null)
+                .SetProperty(e => e.UpdatedAt, DateTime.UtcNow));
     }
 
     public async Task SaveChangesAsync()
