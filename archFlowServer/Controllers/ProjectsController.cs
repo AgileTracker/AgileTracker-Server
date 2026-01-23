@@ -1,9 +1,11 @@
 ﻿using archFlowServer.Models.Dtos.Project;
+using archFlowServer.Models.Entities;
 using archFlowServer.Models.Enums;
 using archFlowServer.Models.ViewModels;
 using archFlowServer.Services;
 using archFlowServer.Utils.Authorization;
 using archFlowServer.Utils.Extensions;
+using ArchFlowServer.Models.Dtos.Project;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -190,7 +192,12 @@ public class ProjectsController : ControllerBase
             userId
         );
 
-        return Ok(ResultViewModel.Ok("Convites carregados com sucesso.", invites));
+        return Ok(
+            ResultViewModel<IEnumerable<ProjectInviteResponseDto>>.Ok(
+                "Convites carregados com sucesso.", 
+                invites
+                )
+            );
     }
 
     [Authorize]

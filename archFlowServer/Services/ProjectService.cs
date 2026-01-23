@@ -5,6 +5,7 @@ using archFlowServer.Models.Entities;
 using archFlowServer.Models.Enums;
 using archFlowServer.Models.Exceptions;
 using archFlowServer.Repositories.Interfaces;
+using ArchFlowServer.Models.Dtos.Project;
 
 namespace archFlowServer.Services;
 
@@ -222,15 +223,14 @@ public class ProjectService
         await _inviteRepository.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<ProjectInvite>> GetAllProjectsInviteAsync(Guid projectId, Guid userId)
+    public async Task<IEnumerable<ProjectInviteResponseDto>> GetAllProjectsInviteAsync(Guid projectId, Guid userId)
     {
         var project = await _repository.GetByIdAsync(projectId, userId)
                      ?? throw new NotFoundException("Projeto não encontrado.");
 
-        var invites = await _inviteRepository.GetAllAsync(projectId)
-                     ?? throw new DomainException("Projeto Inválido.");
+        var invites = await _inviteRepository.GetAllAsync(projectId);
 
-        return invites;
+        return invites.Select(MapInviteToDto);
     }
 
 
@@ -244,6 +244,20 @@ public class ProjectService
             Description = project.Description,
             Status = project.Status,
             CreatedAt = project.CreatedAt
+        };
+    }
+
+    private static ProjectInviteResponseDto MapInviteToDto(ProjectInvite project_invite)
+    {
+        return new ProjectInviteResponseDto
+        {
+            Id = project_invite.Id,
+            ProjectId = project_invite.ProjectId,
+            Email = project_invite.Email,
+            Role = project_invite.Role,
+            ExpiresAt = project_invite.ExpiresAt,
+            CreatedAt = project_invite.CreatedAt,
+            Accepted = project_invite.Accepted
         };
     }
 }
