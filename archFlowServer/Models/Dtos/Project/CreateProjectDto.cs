@@ -3,15 +3,15 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace archFlowServer.Models.Dtos.Project;
 
-[SwaggerSchema(Description = "DTO para criaÃ§Ã£o de um projeto.")]
+[SwaggerSchema(Description = "DTO para criação de um projeto.")]
 public class CreateProjectDto
 {
     [SwaggerSchema("Nome do projeto.")]
-    [Required(ErrorMessage = "Nome Ã© obrigatÃ³rio.")]
-    [MinLength(3, ErrorMessage = "Nome deve ter no mÃ­nimo 3 caracteres.")]
+    [Required(ErrorMessage = "Nome é obrigatório.")]
+    [MinLength(3, ErrorMessage = "Nome deve ter no mínimo 3 caracteres.")]
     public string Name { get; set; } = string.Empty;
 
-    [SwaggerSchema("DescriÃ§Ã£o do projeto.")]
+    [SwaggerSchema("Descrição do projeto.")]
     public string Description { get; set; } = string.Empty;
 }
 

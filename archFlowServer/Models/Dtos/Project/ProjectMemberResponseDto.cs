@@ -11,10 +11,10 @@ public class ProjectMemberResponseDto
     [SwaggerSchema("Nome completo do usuário.")]
     public string Name { get; set; } = string.Empty;
 
-    [SwaggerSchema("Email do usuário. Deve ser Ãºnico.")]
+    [SwaggerSchema("Email do usuário.")]
     public string Email { get; set; } = string.Empty;
     
-    [SwaggerSchema("FunÃ§Ã£o do membro na equipe (exemplo: 'Owner', 'ScrumMaster', 'ProductOwner', 'Developer').")]
+    [SwaggerSchema("Função do membro na equipe (exemplo: 'Owner', 'ScrumMaster', 'ProductOwner', 'Developer').")]
     public MemberRole Role { get; set; } = MemberRole.Developer;
 
     [SwaggerSchema("Senha em texto puro para cadastro. SerÃ¡ hasheada no servidor.")]

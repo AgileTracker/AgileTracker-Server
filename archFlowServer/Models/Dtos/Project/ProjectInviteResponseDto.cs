@@ -15,7 +15,7 @@ namespace ArchFlowServer.Models.Dtos.Project
         [SwaggerSchema("Email para enviar o convite.")]
         public string Email { get; set; } = string.Empty;
 
-        [SwaggerSchema("Função dentro do projeto.")]
+        [SwaggerSchema("Função do membro na equipe (exemplo: 'Owner', 'ScrumMaster', 'ProductOwner', 'Developer').")]
         public MemberRole Role { get; set; }
 
         [SwaggerSchema("Data de expiração do convite.")]
