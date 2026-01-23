@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "2L8DkBDBx8E=",
+  "dgSpecHash": "2VYtapWTGlQ=",
   "success": true,
   "projectFilePath": "C:\\Leo\\ArchFlow-Server\\archFlowServer\\archFlowServer.csproj",
   "expectedPackageFiles": [
@@ -54,6 +54,7 @@
     "C:\\Users\\leonardo.silva\\.nuget\\packages\\mono.texttemplating\\3.0.0\\mono.texttemplating.3.0.0.nupkg.sha512",
     "C:\\Users\\leonardo.silva\\.nuget\\packages\\npgsql\\9.0.0\\npgsql.9.0.0.nupkg.sha512",
     "C:\\Users\\leonardo.silva\\.nuget\\packages\\npgsql.entityframeworkcore.postgresql\\9.0.0\\npgsql.entityframeworkcore.postgresql.9.0.0.nupkg.sha512",
+    "C:\\Users\\leonardo.silva\\.nuget\\packages\\scalar.aspnetcore\\2.12.14\\scalar.aspnetcore.2.12.14.nupkg.sha512",
     "C:\\Users\\leonardo.silva\\.nuget\\packages\\swashbuckle.aspnetcore\\6.5.0\\swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
     "C:\\Users\\leonardo.silva\\.nuget\\packages\\swashbuckle.aspnetcore.annotations\\6.5.0\\swashbuckle.aspnetcore.annotations.6.5.0.nupkg.sha512",
     "C:\\Users\\leonardo.silva\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.5.0\\swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
@@ -81,7 +82,7 @@
     {
       "code": "NU1603",
       "level": "Warning",
-      "message": "ArchFlowServer depende de Microsoft.AspNetCore.OpenApi (>= 9.0.0-preview.5.24306.7), mas Microsoft.AspNetCore.OpenApi 9.0.0-preview.5.24306.7 não foi encontrado. Microsoft.AspNetCore.OpenApi 9.0.0-preview.5.24306.11 foi resolvido em vez disso.",
+      "message": "ArchFlowServer depende de Microsoft.AspNetCore.OpenApi (>= 9.0.0-preview.5.24306.7) mas Microsoft.AspNetCore.OpenApi 9.0.0-preview.5.24306.7 não foi encontrado. Microsoft.AspNetCore.OpenApi 9.0.0-preview.5.24306.11 foi resolvido.",
       "projectPath": "C:\\Leo\\ArchFlow-Server\\archFlowServer\\archFlowServer.csproj",
       "warningLevel": 1,
       "filePath": "C:\\Leo\\ArchFlow-Server\\archFlowServer\\archFlowServer.csproj",

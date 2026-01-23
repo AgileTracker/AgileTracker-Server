@@ -1,7 +1,4 @@
-﻿using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using archFlowServer.Data;
+﻿using archFlowServer.Data;
 using archFlowServer.Infrastructure.Email;
 using archFlowServer.Middlewares;
 using archFlowServer.Models.ViewModels;
@@ -17,6 +14,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -228,8 +229,13 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapSwagger("/openapi/{documentName}.json");
+    app.MapScalarApiReference(options =>
+    {
+        options.WithTitle("ArchFlow Server API")
+               .WithOpenApiRoutePattern("/openapi/{documentName}.json");
+    });
+
     app.UseCors("DevelopmentCors");
 }
 
