@@ -1,4 +1,4 @@
-# 🚀 Agile Tracker Server
+# 🚀 ArchFlow Server
 
 > Backend robusto e escalável para gestão de projetos ágeis, construído com .NET 9 e seguindo princípios de Domain-Driven Design (DDD).
 
@@ -27,7 +27,7 @@
 
 ## 📖 Sobre o Projeto
 
-O **Agile Tracker Server** é uma API RESTful desenvolvida em **.NET 9** que oferece recursos completos para gestão de projetos ágeis, integrando metodologias como **Scrum** e **Kanban**. 
+O **ArchFlow Server** é uma API RESTful desenvolvida em **.NET 9** que oferece recursos completos para gestão de projetos ágeis, integrando metodologias como **Scrum** e **Kanban**. 
 
 O sistema permite:
 - Gerenciamento de projetos, sprints e backlogs
@@ -52,7 +52,7 @@ O sistema permite:
 O projeto segue uma arquitetura em camadas inspirada em **Domain-Driven Design**, onde cada camada tem uma responsabilidade bem definida:
 
 ```
-agileTrackerServer/
+ArchFlow-Server/
 │
 ├── Controllers/          # Endpoints da API (Presentation Layer)
 ├── Services/             # Lógica de negócio (Application Layer)
@@ -527,7 +527,7 @@ O projeto utiliza **EF Core** com **PostgreSQL** seguindo **Code First approach*
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Host=localhost;Port=5432;Database=agiletracker_dev;Username=postgres;Password=root";
+    ?? "Host=localhost;Port=5432;Database=archflow_dev;Username=postgres;Password=root";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -700,8 +700,8 @@ public class ProjectsController : ControllerBase
 1. **Clone o repositório**
 
 ```bash
-git clone https://github.com/seu-usuario/agile-tracker-server.git
-cd agile-tracker-server
+git clone https://github.com/ArchFlowPlatform/ArchFlow-Server.git
+cd ArchFlow-Server
 ```
 
 2. **Configure o banco de dados**
@@ -711,7 +711,7 @@ Edite `appsettings.json` ou `appsettings.Development.json`:
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Port=5432;Database=agiletracker_dev;Username=postgres;Password=sua_senha"
+    "DefaultConnection": "Host=localhost;Port=5432;Database=archflow_dev;Username=postgres;Password=sua_senha"
   },
   "Security": {
     "JwtSecret": "sua-chave-secreta-super-segura-aqui"
