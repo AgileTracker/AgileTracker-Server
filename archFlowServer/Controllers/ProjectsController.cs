@@ -116,7 +116,20 @@ public class ProjectsController : ControllerBase
         return Ok(ResultViewModel.Ok("Projeto arquivado com sucesso."));
     }
 
-    
+    // POST api/projects/{id}/archive
+    [Authorize]
+    [Authorize(Policy = "CanArchiveProject")]
+    [HttpPost("{id:guid}/restore")]
+    public async Task<IActionResult> Restore(Guid id)
+    {
+        var userId = User.GetUserId();
+
+        await _service.RestoreAsync(id, userId);
+
+        return Ok(ResultViewModel.Ok("Projeto restaurado com sucesso."));
+    }
+
+
     [Authorize]
     [Authorize(Policy = "CanManageMembers")]
     [HttpPost("{id:guid}/members")]

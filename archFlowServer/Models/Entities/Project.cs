@@ -102,5 +102,12 @@ public class Project
 
         Status = ProjectStatus.Archived;
     }
+
+    public void Restore(Guid executorUserId)
+    {
+        EnsurePermission(executorUserId, MemberRole.Owner);
+
+        Status = ProjectStatus.Active;
+    }
 }
 

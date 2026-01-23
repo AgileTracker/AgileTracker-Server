@@ -4,7 +4,6 @@ using archFlowServer.Models.Enums;
 using archFlowServer.Models.Exceptions;
 using archFlowServer.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace archFlowServer.Repositories.Implementations;
 
@@ -28,11 +27,21 @@ public class ProjectRepository : IProjectRepository
             .ToListAsync();
     }
 
+    public async Task<Project?> GetByIdIncludingArchivedAsync(Guid projectId, Guid userId)
+    {
+        return await _context.Projects
+            .Include(p => p.Members)
+            .FirstOrDefaultAsync(p =>
+                p.Id == projectId &&
+                p.Status == ProjectStatus.Archived &&
+                p.Members.Any(m => m.UserId == userId)
+            );
+    }
+
     public async Task<Project?> GetByIdAsync(Guid projectId, Guid userId)
     {
         return await _context.Projects
             .Include(p => p.Members)
-            .Include(p => p.ProductBacklog)
             .FirstOrDefaultAsync(p =>
                 p.Id == projectId &&
                 p.Status == ProjectStatus.Active &&
@@ -57,7 +66,7 @@ public class ProjectRepository : IProjectRepository
             pm.UserId == userId);
 
         if (!hasAccess)
-            throw new DomainException("VocÃª não tem acesso a este projeto.");
+            throw new DomainException("Você não tem acesso a este projeto.");
 
         return await _context.ProjectMembers
             .Include(pm => pm.User)

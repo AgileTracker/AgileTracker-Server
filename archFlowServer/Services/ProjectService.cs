@@ -84,7 +84,17 @@ public class ProjectService
 
         await _repository.SaveChangesAsync();
     }
-    
+
+    public async Task RestoreAsync(Guid projectId, Guid executorUserId)
+    {
+        var project = await _repository.GetByIdIncludingArchivedAsync(projectId, executorUserId)
+            ?? throw new NotFoundException("Projeto não encontrado.");
+
+        project.Restore(executorUserId);
+
+        await _repository.SaveChangesAsync();
+    }
+
     public async Task AddMemberAsync(
         Guid projectId,
         Guid executorUserId,
