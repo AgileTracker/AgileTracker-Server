@@ -7,7 +7,7 @@ public interface IProjectInviteRepository
     Task AddAsync(ProjectInvite invite);
     Task<IEnumerable<ProjectInvite>> GetAllAsync(Guid projectId);
     Task<ProjectInvite?> GetByTokenAsync(string token);
-    Task<bool> ExistsActiveInviteAsync(Guid projectId, string email);
+    Task<bool> ExistsPendingInviteAsync(Guid projectId, string email);
     void Delete(ProjectInvite invite);
     Task SaveChangesAsync();
 }

@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace archFlowServer.Migrations
+namespace ArchFlowServer.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -82,7 +82,7 @@ namespace archFlowServer.Migrations
                     Token = table.Column<string>(type: "text", nullable: false),
                     ExpiresAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    Accepted = table.Column<bool>(type: "boolean", nullable: false)
+                    Status = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -138,6 +138,8 @@ namespace archFlowServer.Migrations
                     Position = table.Column<int>(type: "integer", nullable: false),
                     Priority = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     Color = table.Column<string>(type: "character varying(7)", maxLength: 7, nullable: false, defaultValue: "#3498db"),
+                    IsArchived = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    ArchivedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()"),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()")
                 },
@@ -173,6 +175,8 @@ namespace archFlowServer.Migrations
                     Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Position = table.Column<int>(type: "integer", nullable: false),
                     AssigneeId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsArchived = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
+                    ArchivedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()"),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()")
                 },
@@ -196,6 +200,11 @@ namespace archFlowServer.Migrations
                 column: "ProductBacklogId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_epics_ProductBacklogId_IsArchived",
+                table: "epics",
+                columns: new[] { "ProductBacklogId", "IsArchived" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_epics_ProductBacklogId_Position",
                 table: "epics",
                 columns: new[] { "ProductBacklogId", "Position" },
@@ -211,7 +220,8 @@ namespace archFlowServer.Migrations
                 name: "IX_project_invites_ProjectId_Email",
                 table: "project_invites",
                 columns: new[] { "ProjectId", "Email" },
-                unique: true);
+                unique: true,
+                filter: "\"Status\" = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_project_invites_Token",
@@ -234,6 +244,11 @@ namespace archFlowServer.Migrations
                 name: "IX_user_stories_EpicId",
                 table: "user_stories",
                 column: "EpicId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_stories_EpicId_IsArchived",
+                table: "user_stories",
+                columns: new[] { "EpicId", "IsArchived" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_user_stories_EpicId_Position",
@@ -274,4 +289,3 @@ namespace archFlowServer.Migrations
         }
     }
 }
-

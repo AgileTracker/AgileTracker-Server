@@ -24,7 +24,7 @@ namespace ArchFlowServer.Models.Dtos.Project
         [SwaggerSchema("Data de envio do convite.")]
         public DateTime CreatedAt { get; set; }
 
-        [SwaggerSchema("Convite aceito ou não.")]
-        public bool Accepted { get; set; }
+        [SwaggerSchema("Status do convite.")]
+        public InviteStatus Status { get; set; }
     }
 }

@@ -31,23 +31,21 @@ public class ProjectInviteRepository : IProjectInviteRepository
     {
         return await _context.Set<ProjectInvite>()
             .FirstOrDefaultAsync(i =>
-                i.Token == token &&
-                !i.Accepted
+                i.Token == token 
             );
     }
 
-    public async Task<bool> ExistsActiveInviteAsync(
-        Guid projectId,
-        string email)
+    public async Task<bool> ExistsPendingInviteAsync(Guid projectId, string email)
     {
         var now = DateTime.UtcNow;
 
         return await _context.Set<ProjectInvite>()
+            .AsNoTracking()
             .AnyAsync(i =>
                 i.ProjectId == projectId &&
-                i.Email == email.ToLower() &&
-                !i.Accepted &&
-                i.ExpiresAt > now
+                i.Email == email &&
+                i.Status == InviteStatus.Pending &&
+                i.ExpiresAt > now 
             );
     }
 

@@ -9,11 +9,11 @@ using archFlowServer.Data;
 
 #nullable disable
 
-namespace archFlowServer.Migrations
+namespace ArchFlowServer.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260113235156_AddArchiveFieldsToEpicsAndUserStories")]
-    partial class AddArchiveFieldsToEpicsAndUserStories
+    [Migration("20260126183014_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,9 +174,6 @@ namespace archFlowServer.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Accepted")
-                        .HasColumnType("boolean");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp without time zone");
 
@@ -195,6 +192,9 @@ namespace archFlowServer.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Token")
                         .IsRequired()
                         .HasColumnType("text");
@@ -205,7 +205,8 @@ namespace archFlowServer.Migrations
                         .IsUnique();
 
                     b.HasIndex("ProjectId", "Email")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("\"Status\" = 0");
 
                     b.ToTable("project_invites", (string)null);
                 });
@@ -476,4 +477,3 @@ namespace archFlowServer.Migrations
         }
     }
 }
-

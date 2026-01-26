@@ -12,7 +12,7 @@ public class ProjectInvite
     public string Token { get; private set; } = string.Empty;
     public DateTime ExpiresAt { get; private set; }
     public DateTime CreatedAt { get; private set; }
-    public bool Accepted { get; private set; }
+    public InviteStatus Status { get; private set; }
 
     private ProjectInvite() { }
 
@@ -30,23 +30,66 @@ public class ProjectInvite
 
         Id = Guid.NewGuid();
         ProjectId = projectId;
-        Email = email.Trim().ToLower();
+        Email = email.Trim().ToLowerInvariant();
         Role = role;
         Token = Guid.NewGuid().ToString("N");
         CreatedAt = DateTime.UtcNow;
         ExpiresAt = CreatedAt.Add(expiration);
-        Accepted = false;
+        Status = InviteStatus.Pending;
     }
 
     public void Accept()
     {
-        if (Accepted)
-            throw new ConflictException("Convite jÃ¡ foi aceito.");
+        if (Status == InviteStatus.Accepted)
+            throw new ConflictException("Convite já foi aceito.");
+
+        if (Status == InviteStatus.Declined)
+            throw new ConflictException("Convite já foi recusado.");
+
+        if (Status == InviteStatus.Revoked)
+            throw new ConflictException("Convite foi revogado.");
 
         if (DateTime.UtcNow > ExpiresAt)
             throw new DomainException("Convite expirado.");
 
-        Accepted = true;
+        Status = InviteStatus.Accepted;
     }
+
+
+    public void Decline()
+    {
+        if (Status == InviteStatus.Accepted)
+            throw new ConflictException("Convite já foi aceito.");
+
+        if (Status == InviteStatus.Declined)
+            throw new ConflictException("Convite já foi recusado.");
+
+        if (Status == InviteStatus.Revoked)
+            throw new ConflictException("Convite foi revogado.");
+
+        if (DateTime.UtcNow > ExpiresAt)
+            throw new DomainException("Convite expirado.");
+
+        Status = InviteStatus.Declined;
+    }
+
+    public void Revoke()
+    {
+        if (Status == InviteStatus.Accepted)
+            throw new ConflictException("Convite já foi aceito.");
+
+        if (Status == InviteStatus.Declined)
+            throw new ConflictException("Convite já foi recusado.");
+
+        if (Status == InviteStatus.Revoked)
+            throw new ConflictException("Convite foi revogado.");
+
+        if (DateTime.UtcNow > ExpiresAt)
+            throw new DomainException("Convite expirado.");
+
+        Status = InviteStatus.Revoked;
+    }
+
+
 }
 

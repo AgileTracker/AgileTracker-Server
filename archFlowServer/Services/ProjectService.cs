@@ -163,8 +163,8 @@ public class ProjectService
                       ?? throw new NotFoundException("usuário executor não encontrado.");
 
         // 3) Evita convites duplicados ativos
-        if (await _inviteRepository.ExistsActiveInviteAsync(projectId, email))
-            throw new ConflictException("JÃ¡ existe um convite ativo para este email.");
+        if (await _inviteRepository.ExistsPendingInviteAsync(projectId, email))
+            throw new ConflictException("Já existe um convite pendente para este email.");
 
         // 4) Cria e persiste (token serÃ¡ utilizado apÃ³s salvar)
         var invite = new ProjectInvite(
@@ -196,32 +196,6 @@ public class ProjectService
             )
         );
     }
-    
-    public async Task AcceptInviteAsync(
-        string token,
-        Guid userId)
-    {
-        var invite = await _inviteRepository.GetByTokenAsync(token)
-                     ?? throw new DomainException("Convite inválido.");
-
-        invite.Accept();
-
-        // adiciona membro real
-        var project = await _repository.GetByIdAsync(invite.ProjectId, userId)
-                      ?? throw new NotFoundException("Projeto não encontrado.");
-
-        var userInvited = await _userRepository.GetByEmailAsync(invite.Email)
-                        ?? throw new NotFoundException("usuário não encontrado.");
-
-        project.AddMember(
-            executorUserId: userId,
-            newUserId: userInvited.Id,
-            role: invite.Role
-        );
-        
-        _inviteRepository.Delete(invite);
-        await _inviteRepository.SaveChangesAsync();
-    }
 
     public async Task<IEnumerable<ProjectInviteResponseDto>> GetAllProjectsInviteAsync(Guid projectId, Guid userId)
     {
@@ -233,8 +207,55 @@ public class ProjectService
         return invites.Select(MapInviteToDto);
     }
 
+    public async Task AcceptInviteAsync(
+        string token,
+        Guid userId)
+    {
+        var invite = await _inviteRepository.GetByTokenAsync(token)
+                     ?? throw new DomainException("Convite inválido.");
 
-    
+        // adiciona membro real
+        var project = await _repository.GetByIdAsync(invite.ProjectId, userId)
+                      ?? throw new NotFoundException("Projeto não encontrado.");
+
+        var userInvited = await _userRepository.GetByEmailAsync(invite.Email)
+                        ?? throw new NotFoundException("usuário não encontrado.");
+
+        invite.Accept();
+
+        project.AddMember(
+            executorUserId: userId,
+            newUserId: userInvited.Id,
+            role: invite.Role
+        );
+        
+        await _inviteRepository.SaveChangesAsync();
+    }
+
+    public async Task DeclineInviteAsync(
+        string token,
+        Guid userId)
+    {
+        var invite = await _inviteRepository.GetByTokenAsync(token)
+                     ?? throw new DomainException("Convite inválido.");
+
+        invite.Decline();
+
+        await _inviteRepository.SaveChangesAsync();
+    }
+
+    public async Task RevokeInviteAsync(
+        string token,
+        Guid userId)
+    {
+        var invite = await _inviteRepository.GetByTokenAsync(token)
+                     ?? throw new DomainException("Convite inválido.");
+
+        invite.Revoke();
+
+        await _inviteRepository.SaveChangesAsync();
+    }
+
     private static ProjectResponseDto MapToDto(Project project)
     {
         return new ProjectResponseDto
@@ -257,7 +278,7 @@ public class ProjectService
             Role = project_invite.Role,
             ExpiresAt = project_invite.ExpiresAt,
             CreatedAt = project_invite.CreatedAt,
-            Accepted = project_invite.Accepted
+            Status = project_invite.Status
         };
     }
 }

@@ -220,7 +220,7 @@ public class ProjectsController : ControllerBase
     }
 
     [AllowAnonymous]
-    [HttpPost("invites/{token}/accept")]
+    [HttpPut("invites/{token}/accept")]
     public async Task<IActionResult> AcceptInvite(string token)
     {
         var userId = User.GetUserId();
@@ -228,6 +228,29 @@ public class ProjectsController : ControllerBase
         await _service.AcceptInviteAsync(token, userId);
 
         return Ok(ResultViewModel.Ok("Convite aceito com sucesso."));
+    }
+
+    [AllowAnonymous]
+    [HttpPut("invites/{token}/decline")]
+    public async Task<IActionResult> DeclineInvite(string token)
+    {
+        var userId = User.GetUserId();
+
+        await _service.DeclineInviteAsync(token, userId);
+
+        return Ok(ResultViewModel.Ok("Convite recusado com sucesso."));
+    }
+
+    [Authorize]
+    [Authorize(Policy = "CanManageMembers")]
+    [HttpPut("invites/{token}/revoke")]
+    public async Task<IActionResult> RevokeInvite(string token)
+    {
+        var userId = User.GetUserId();
+
+        await _service.RevokeInviteAsync(token, userId);
+
+        return Ok(ResultViewModel.Ok("Convite cancelado com sucesso."));
     }
 
 
