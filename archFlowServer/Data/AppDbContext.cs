@@ -197,7 +197,6 @@ namespace archFlowServer.Data
                   entity.Property(pb => pb.ProjectId)
                         .IsRequired();
 
-                  // ðŸ” sÃ³ pode existir 1 backlog por projeto
                   entity.HasIndex(pb => pb.ProjectId)
                         .IsUnique();
 
@@ -333,6 +332,113 @@ namespace archFlowServer.Data
                 entity.HasCheckConstraint("CK_UserStory_Complexity", "\"Complexity\" IN ('Low','Medium','High','VeryHigh')");
                 entity.HasCheckConstraint("CK_UserStory_BusinessValue", "\"BusinessValue\" IN ('High','Medium','Low')");
                 entity.HasCheckConstraint("CK_UserStory_Status", "\"Status\" IN ('Draft','Ready','InProgress','Done')");
+            });
+
+            modelBuilder.Entity<Board>(entity =>
+            {
+                entity.ToTable("boards");
+                entity.HasKey(b => b.Id);
+
+                entity.Property(b => b.ProjectId).IsRequired();
+                entity.Property(b => b.SprintId).IsRequired();
+
+                entity.Property(b => b.Name).HasMaxLength(255).IsRequired();
+                entity.Property(b => b.Description).HasColumnType("text");
+
+                entity.Property(b => b.BoardType)
+                      .HasConversion<string>()
+                      .HasMaxLength(30)
+                      .HasDefaultValue(BoardType.Kanban)
+                      .IsRequired();
+
+                entity.Property(b => b.CreatedAt).HasDefaultValueSql("NOW()").IsRequired();
+                entity.Property(b => b.UpdatedAt).HasDefaultValueSql("NOW()").IsRequired();
+
+                entity.HasOne(b => b.Project)
+                      .WithMany()
+                      .HasForeignKey(b => b.ProjectId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(b => b.Sprint)
+                      .WithOne(s => s.Board)
+                      .HasForeignKey<Board>(b => b.SprintId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(b => b.SprintId)
+                      .IsUnique();
+            });
+
+            modelBuilder.Entity<SprintItem>(entity =>
+            {
+                entity.ToTable("sprint_items");
+                entity.HasKey(si => si.Id);
+
+                entity.Property(si => si.Id)
+                      .ValueGeneratedOnAdd()
+                      .UseIdentityByDefaultColumn(); 
+
+                entity.Property(si => si.SprintId).IsRequired();
+                entity.Property(si => si.UserStoryId).IsRequired();
+
+                entity.Property(si => si.AddedAt)
+                      .HasDefaultValueSql("NOW()")
+                      .IsRequired();
+
+                entity.HasOne(si => si.Sprint)
+                      .WithMany(s => s.Items)
+                      .HasForeignKey(si => si.SprintId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(si => si.UserStory)
+                      .WithMany()
+                      .HasForeignKey(si => si.UserStoryId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(si => new { si.SprintId, si.UserStoryId })
+                      .IsUnique();
+            });
+
+
+            modelBuilder.Entity<Sprint>(entity =>
+            {
+                entity.ToTable("sprints");
+                entity.HasKey(s => s.Id);
+
+                entity.Property(s => s.ProjectId).IsRequired();
+
+                entity.Property(s => s.Name).HasMaxLength(255).IsRequired();
+                entity.Property(s => s.Goal).HasColumnType("text");
+
+                entity.Property(s => s.StartDate).HasColumnType("date").IsRequired();
+                entity.Property(s => s.EndDate).HasColumnType("date").IsRequired();
+
+                entity.Property(s => s.Status)
+                      .HasConversion<string>()
+                      .HasMaxLength(20)
+                      .HasDefaultValue(SprintStatus.Planned)
+                      .IsRequired();
+
+                entity.Property(s => s.CapacityHours).HasDefaultValue(0).IsRequired();
+
+                entity.Property(s => s.IsArchived).HasDefaultValue(false).IsRequired();
+                entity.Property(s => s.ArchivedAt).IsRequired(false);
+
+                // se você seta no domínio, pode remover o default SQL (recomendado),
+                // mas aqui vou manter só o que você pediu: remover gen_random_uuid.
+                entity.Property(s => s.CreatedAt).HasDefaultValueSql("NOW()").IsRequired();
+                entity.Property(s => s.UpdatedAt).HasDefaultValueSql("NOW()").IsRequired();
+
+                entity.HasOne(s => s.Project)
+                      .WithMany()
+                      .HasForeignKey(s => s.ProjectId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasCheckConstraint("CK_Sprint_DateRange", "\"StartDate\" < \"EndDate\"");
+                entity.HasCheckConstraint("CK_Sprint_Status", "\"Status\" IN ('Planned','Active','Closed','Cancelled')");
+
+                entity.HasIndex(s => s.ProjectId)
+                      .IsUnique()
+                      .HasFilter("\"Status\" = 'Active' AND \"IsArchived\" = false");
             });
         }
     }

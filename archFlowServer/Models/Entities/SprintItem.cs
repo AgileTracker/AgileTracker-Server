@@ -4,10 +4,10 @@ namespace archFlowServer.Models.Entities;
 
 public class SprintItem
 {
-    public Guid Id { get; private set; }
+    public int Id { get; private set; }           
 
     public Guid SprintId { get; private set; }
-    public int UserStoryId { get; private set; }   // <-- int (alinhado com UserStory.Id)
+    public int UserStoryId { get; private set; }
 
     public DateTime AddedAt { get; private set; }
 
@@ -25,7 +25,6 @@ public class SprintItem
         if (userStoryId <= 0)
             throw new DomainException("UserStoryId inválido.");
 
-        Id = Guid.NewGuid();
         SprintId = sprintId;
         UserStoryId = userStoryId;
         AddedAt = DateTime.UtcNow;
