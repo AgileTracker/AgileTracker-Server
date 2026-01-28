@@ -103,9 +103,10 @@ namespace ArchFlowServer.Migrations
                     ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Goal = table.Column<string>(type: "text", nullable: false),
+                    ExecutionPlan = table.Column<string>(type: "text", nullable: false),
                     StartDate = table.Column<DateTime>(type: "date", nullable: false),
                     EndDate = table.Column<DateTime>(type: "date", nullable: false),
-                    Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false, defaultValue: "Planned"),
+                    Status = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     CapacityHours = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     IsArchived = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
                     ArchivedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
@@ -262,6 +263,8 @@ namespace ArchFlowServer.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SprintId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserStoryId = table.Column<int>(type: "integer", nullable: false),
+                    Position = table.Column<int>(type: "integer", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: false),
                     AddedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
@@ -339,6 +342,12 @@ namespace ArchFlowServer.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_sprint_items_SprintId_Position",
+                table: "sprint_items",
+                columns: new[] { "SprintId", "Position" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_sprint_items_SprintId_UserStoryId",
                 table: "sprint_items",
                 columns: new[] { "SprintId", "UserStoryId" },
@@ -352,9 +361,7 @@ namespace ArchFlowServer.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_sprints_ProjectId",
                 table: "sprints",
-                column: "ProjectId",
-                unique: true,
-                filter: "\"Status\" = 'Active' AND \"IsArchived\" = false");
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_user_stories_EpicId",

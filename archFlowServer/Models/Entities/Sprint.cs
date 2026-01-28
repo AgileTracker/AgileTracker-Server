@@ -12,6 +12,7 @@ public class Sprint
 
     public string Name { get; private set; } = string.Empty;
     public string Goal { get; private set; } = string.Empty;
+    public string ExecutionPlan { get; private set; } = string.Empty;
 
     // mantendo DateTime por compatibilidade com DTOs atuais
     public DateTime StartDate { get; private set; }
@@ -38,6 +39,7 @@ public class Sprint
         Guid projectId,
         string name,
         string? goal,
+        string? executionPlan,
         DateTime startDate,
         DateTime endDate,
         int capacityHours)
@@ -59,6 +61,7 @@ public class Sprint
 
         Name = name.Trim();
         Goal = goal?.Trim() ?? string.Empty;
+        ExecutionPlan = executionPlan?.Trim() ?? string.Empty;
 
         StartDate = startDate.Date;
         EndDate = endDate.Date;
@@ -70,7 +73,7 @@ public class Sprint
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void UpdateDetails(string name, string? goal, DateTime startDate, DateTime endDate, int capacityHours)
+    public void UpdateDetails(string name, string? goal, string? executionPlan, DateTime startDate, DateTime endDate, int capacityHours)
     {
         if (Status is SprintStatus.Closed or SprintStatus.Cancelled)
             throw new ConflictException("Não é possível editar sprint fechada/cancelada.");
@@ -86,6 +89,7 @@ public class Sprint
 
         Name = name.Trim();
         Goal = goal?.Trim() ?? string.Empty;
+        ExecutionPlan = executionPlan?.Trim() ?? string.Empty;
         StartDate = startDate.Date;
         EndDate = endDate.Date;
         CapacityHours = capacityHours;

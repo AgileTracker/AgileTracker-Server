@@ -85,6 +85,7 @@ public class SprintService
             projectId: projectId,
             name: dto.Name,
             goal: dto.Goal,
+            executionPlan: dto.ExecutionPlan,
             startDate: dto.StartDate,
             endDate: dto.EndDate,
             capacityHours: dto.CapacityHours
@@ -134,6 +135,7 @@ public class SprintService
         sprint.UpdateDetails(
             name: dto.Name,
             goal: dto.Goal,
+            executionPlan: dto.ExecutionPlan,
             startDate: dto.StartDate,
             endDate: dto.EndDate,
             capacityHours: dto.CapacityHours
@@ -239,6 +241,7 @@ public class SprintService
             sprint.ProjectId,
             sprint.Name,
             sprint.Goal,
+            sprint.ExecutionPlan,
             sprint.StartDate,
             sprint.EndDate,
             MapStatus(sprint.Status),

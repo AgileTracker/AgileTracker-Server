@@ -253,6 +253,7 @@ public class ProjectService
             Id = project.Id,
             Name = project.Name,
             Description = project.Description,
+            OwnerId = project.OwnerId,
             Status = project.Status,
             CreatedAt = project.CreatedAt
         };

@@ -315,6 +315,10 @@ namespace ArchFlowServer.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("date");
 
+                    b.Property<string>("ExecutionPlan")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Goal")
                         .IsRequired()
                         .HasColumnType("text");
@@ -337,10 +341,8 @@ namespace ArchFlowServer.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("character varying(20)")
-                        .HasDefaultValue("Planned");
+                        .HasColumnType("character varying(20)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -349,9 +351,7 @@ namespace ArchFlowServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProjectId")
-                        .IsUnique()
-                        .HasFilter("\"Status\" = 'Active' AND \"IsArchived\" = false");
+                    b.HasIndex("ProjectId");
 
                     b.ToTable("sprints", null, t =>
                         {
@@ -374,6 +374,13 @@ namespace ArchFlowServer.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasDefaultValueSql("NOW()");
 
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("SprintId")
                         .HasColumnType("uuid");
 
@@ -383,6 +390,9 @@ namespace ArchFlowServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("UserStoryId");
+
+                    b.HasIndex("SprintId", "Position")
+                        .IsUnique();
 
                     b.HasIndex("SprintId", "UserStoryId")
                         .IsUnique();

@@ -5,6 +5,7 @@ public sealed record SprintResponseDto(
     Guid ProjectId,
     string Name,
     string Goal,
+    string ExecutionPlan,
     DateTime StartDate,
     DateTime EndDate,
     SprintStatusDto Status,
